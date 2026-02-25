@@ -1,525 +1,1073 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BBO DROP ZONE | Broadcast Engagement</title>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#080808">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { 
-            theme: { 
-                extend: { 
-                    colors: { 
-                        bbo: '#FF1493', 
-                        'bbo-light': '#FF69B4',
-                        black: '#080808',
-                        panel: '#111111'
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'system-ui', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    }
-                } 
-            } 
-        }
-    </script>
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    
-    <style>
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BBO BROADCAST DROP | Content Command Center</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#080808">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config={theme:{extend:{colors:{pink:{hot:'#FF1493',glow:'#FF69B4',dim:'#990D58'},dark:{900:'#080808',800:'#111111',700:'#1a1a1a',600:'#222222',500:'#2a2a2a'}},fontFamily:{inter:['Inter','system-ui','sans-serif'],mono:['JetBrains Mono','monospace']}}}}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',system-ui,sans-serif;background:#080808;color:#fff;overflow-x:hidden;background-image:radial-gradient(ellipse at 50% -20%,rgba(255,20,147,0.07) 0%,transparent 60%)}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#FF1493;border-radius:3px}
+.no-scroll::-webkit-scrollbar{display:none}
+.no-scroll{-ms-overflow-style:none;scrollbar-width:none}
 
-        body {
-            background-color: #080808;
-            color: #ffffff;
-            background-image: radial-gradient(circle at 50% 0%, rgba(255, 20, 147, 0.08) 0%, transparent 50%);
-            overscroll-behavior: none;
-        }
+.glass{background:rgba(17,17,17,0.6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.05)}
+.glass-pink{background:rgba(255,20,147,0.06);backdrop-filter:blur(20px);border:1px solid rgba(255,20,147,0.15)}
+.glass-dark{background:rgba(0,0,0,0.4);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.04)}
 
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.drop-zone{border:2px dashed rgba(255,20,147,0.25);transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
+.drop-zone.drag-over{border-color:#FF1493;background:rgba(255,20,147,0.06);box-shadow:0 0 50px rgba(255,20,147,0.12),inset 0 0 50px rgba(255,20,147,0.04);transform:scale(1.01)}
+.drop-zone.drag-over .drop-pulse{animation:pulse-glow 1.2s infinite}
 
-        .glass-panel {
-            background: rgba(17, 17, 17, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+@keyframes pulse-glow{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.15);opacity:1}}
+@keyframes slide-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes glow-breathe{0%,100%{box-shadow:0 0 15px rgba(255,20,147,0.2)}50%{box-shadow:0 0 30px rgba(255,20,147,0.4)}}
+@keyframes spin{100%{transform:rotate(360deg)}}
+@keyframes typing{0%{opacity:.2}20%{opacity:1}100%{opacity:.2}}
 
-        /* Drag & Drop Styles */
-        .drop-zone {
-            border: 2px dashed rgba(255, 20, 147, 0.3);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .drop-zone.dragover {
-            border-color: #FF1493;
-            background: rgba(255, 20, 147, 0.05);
-            transform: scale(1.02);
-            box-shadow: 0 0 30px rgba(255, 20, 147, 0.2);
-        }
+.anim-slide{animation:slide-up 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
+.anim-fade{animation:fade-in 0.3s ease forwards}
 
-        /* Glowing Button */
-        .glow-btn {
-            background: linear-gradient(135deg, #FF1493, #FF69B4);
-            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.3), inset 0 -2px 0 rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
-        }
-        
-        .glow-btn:hover {
-            box-shadow: 0 6px 25px rgba(255, 20, 147, 0.5), inset 0 -2px 0 rgba(0,0,0,0.2);
-            transform: translateY(-2px);
-        }
-        
-        .glow-btn:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 10px rgba(255, 20, 147, 0.3);
-        }
+.btn-pink{background:linear-gradient(135deg,#FF1493,#CC1177);transition:all 0.25s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
+.btn-pink:hover{transform:translateY(-1px);box-shadow:0 8px 30px rgba(255,20,147,0.35)}
+.btn-pink:active{transform:translateY(0)}
+.btn-pink::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,0.1) 50%,transparent 60%);transform:translateX(-100%);transition:transform 0.5s}
+.btn-pink:hover::after{transform:translateX(100%)}
 
-        .spinner {
-            border: 3px solid rgba(255, 20, 147, 0.2);
-            border-top-color: #FF1493;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
+.btn-ghost{border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);transition:all 0.25s ease}
+.btn-ghost:hover{border-color:rgba(255,20,147,0.35);background:rgba(255,20,147,0.05)}
 
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+.btn-ai{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(255,20,147,0.2);transition:all 0.3s ease;position:relative;overflow:hidden}
+.btn-ai:hover{border-color:rgba(255,20,147,0.5);box-shadow:0 0 25px rgba(255,20,147,0.15)}
+.btn-ai::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(255,20,147,0.1),transparent 30%);animation:spin 4s linear infinite;opacity:0;transition:opacity 0.3s}
+.btn-ai:hover::before{opacity:1}
 
-        .animate-slide {
-            animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+.queue-card{transition:all 0.3s cubic-bezier(0.4,0,0.2,1)}
+.queue-card:hover{transform:translateX(3px);border-color:rgba(255,20,147,0.25)}
+.queue-card.live{animation:glow-breathe 2s infinite;border-color:#FF1493}
 
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 1000;
-            pointer-events: none;
-        }
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-    </style>
+.prompt-chip{transition:all 0.2s ease;cursor:pointer}
+.prompt-chip:hover{background:rgba(255,20,147,0.12);border-color:rgba(255,20,147,0.4);transform:translateY(-1px)}
+.prompt-chip.selected{background:rgba(255,20,147,0.18);border-color:#FF1493;color:#FF1493}
+
+.reaction-set{transition:all 0.2s ease}
+.reaction-set.selected{border-color:rgba(255,20,147,0.4);background:rgba(255,20,147,0.08)}
+
+.reaction-btn{transition:all 0.2s ease;cursor:pointer}
+.reaction-btn:hover{transform:scale(1.2)}
+.reaction-btn:active{transform:scale(0.9)}
+.reaction-btn.picked{background:rgba(255,20,147,0.15);border-color:rgba(255,20,147,0.5)}
+
+.tab-btn{transition:all 0.25s ease;position:relative}
+.tab-btn::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:#FF1493;transform:scaleX(0);transition:transform 0.25s ease}
+.tab-btn.active{color:#FF1493}
+.tab-btn.active::after{transform:scaleX(1)}
+
+.ai-card{transition:all 0.3s ease;position:relative;overflow:hidden}
+.ai-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,20,147,0.4),transparent)}
+.ai-card:hover{border-color:rgba(255,20,147,0.3);transform:translateY(-2px)}
+
+.spinner{border:3px solid rgba(255,20,147,0.15);border-top-color:#FF1493;border-radius:50%;width:22px;height:22px;animation:spin 0.8s linear infinite}
+
+.typing-dots span{animation:typing 1.4s infinite;display:inline-block}
+.typing-dots span:nth-child(2){animation-delay:0.2s}
+.typing-dots span:nth-child(3){animation-delay:0.4s}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);transition:transform 0.4s cubic-bezier(0.16,1,0.3,1),opacity 0.4s;z-index:1000;opacity:0;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+.counter{font-family:'JetBrains Mono',monospace}
+video{max-height:380px}
+img.media-preview{max-height:380px;object-fit:contain}
+
+.status-dot{width:8px;height:8px;border-radius:50%}
+.status-live{background:#FF1493;box-shadow:0 0 8px #FF1493;animation:pulse-glow 2s infinite}
+.status-queued{background:#FFD700}
+.status-draft{background:rgba(255,255,255,0.3)}
+
+.media-thumb{transition:all 0.3s ease;position:relative;overflow:hidden}
+.media-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 50%);pointer-events:none}
+
+.ai-badge{background:linear-gradient(135deg,rgba(255,20,147,0.15),rgba(255,105,180,0.1));border:1px solid rgba(255,20,147,0.25);font-size:9px;letter-spacing:0.1em}
+</style>
 </head>
-<body class="min-h-screen flex flex-col font-sans">
+<body class="min-h-screen font-inter">
 
-    <!-- Navbar -->
-    <nav class="sticky top-0 z-40 glass-panel border-b border-white/10 px-6 py-4 flex justify-between items-center">
+<!-- ========== HEADER ========== -->
+<header class="sticky top-0 z-50 glass border-b border-white/5">
+<div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-pink-hot to-pink-dim flex items-center justify-center font-black text-[11px] tracking-tight shadow-[0_0_15px_rgba(255,20,147,0.4)]">BBO</div>
+    <div>
+      <h1 class="text-sm font-black tracking-tight leading-none">BROADCAST <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-hot to-pink-glow">DROP</span></h1>
+      <p class="text-[9px] text-white/30 font-semibold tracking-[0.2em] uppercase">Content Command Center</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-2">
+    <div id="liveIndicator" class="hidden items-center gap-2 px-3 py-1.5 rounded-full glass-pink">
+      <div class="status-dot status-live"></div>
+      <span class="text-[10px] font-bold text-pink-hot tracking-wider">LIVE</span>
+    </div>
+    <div id="aiStatusBadge" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full ai-badge">
+      <span class="text-pink-hot">⚡</span>
+      <span class="font-bold text-pink-glow uppercase">AI ON</span>
+    </div>
+    <button id="settingsBtn" class="btn-ghost w-9 h-9 rounded-lg flex items-center justify-center text-white/40 hover:text-white">
+      <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+    </button>
+    <button id="clearAllBtn" class="btn-ghost px-3 py-1.5 rounded-lg text-[10px] font-bold text-white/30 hover:text-white uppercase tracking-wider">Clear</button>
+  </div>
+</div>
+</header>
+
+<!-- ========== MAIN LAYOUT ========== -->
+<main class="max-w-7xl mx-auto px-4 py-5 flex flex-col lg:flex-row gap-5">
+
+<!-- ===== LEFT COLUMN: DROP + PREVIEW + AI ===== -->
+<div class="flex-1 flex flex-col gap-5 min-w-0">
+
+  <!-- DROP ZONE -->
+  <section id="dropZone" class="drop-zone rounded-2xl p-8 md:p-10 flex flex-col items-center justify-center text-center min-h-[220px] cursor-pointer relative">
+    <input type="file" id="fileInput" multiple accept="video/*,image/*" class="hidden">
+    <div class="drop-pulse mb-3">
+      <svg class="w-14 h-14 text-pink-hot/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+      </svg>
+    </div>
+    <h2 class="text-base font-black mb-1 tracking-tight">Drop That Content</h2>
+    <p class="text-xs text-white/35 mb-4 max-w-sm font-medium">Drag videos, screenshots, memes straight from Twitter/X. Or browse your files.</p>
+    <div class="flex items-center gap-3">
+      <label id="browseBtn" class="btn-pink px-5 py-2.5 rounded-xl text-xs font-bold cursor-pointer relative z-10">Browse Files</label>
+      <button id="pasteUrlBtn" class="btn-ghost px-4 py-2.5 rounded-xl text-xs font-semibold text-white/50">Paste URL</button>
+    </div>
+    <p class="text-[9px] text-white/15 mt-3 font-mono tracking-wider">MP4 · MOV · WEBM · PNG · JPG · GIF</p>
+  </section>
+
+  <!-- URL INPUT -->
+  <div id="urlInputWrap" class="hidden anim-slide">
+    <div class="glass rounded-xl p-3.5 flex gap-2.5">
+      <input id="urlInput" type="url" placeholder="Paste Twitter/X video URL or image link..." class="flex-1 bg-transparent border border-white/8 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/25 focus:outline-none focus:border-pink-hot/40 transition-colors font-medium">
+      <button id="urlAddBtn" class="btn-pink px-4 py-2.5 rounded-lg text-xs font-bold">Add</button>
+      <button id="urlCancelBtn" class="btn-ghost px-3 py-2.5 rounded-lg text-xs text-white/40 font-semibold">Cancel</button>
+    </div>
+  </div>
+
+  <!-- PREVIEW PANEL -->
+  <section id="previewPanel" class="hidden">
+    <div class="glass rounded-2xl overflow-hidden">
+      <!-- Preview Header -->
+      <div class="px-5 py-3 border-b border-white/5 flex items-center justify-between">
         <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-bbo flex items-center justify-center font-black text-white text-xs tracking-tighter shadow-[0_0_15px_rgba(255,20,147,0.5)]">
-                BBO
-            </div>
-            <div>
-                <h1 class="text-lg font-black tracking-tight leading-none text-white">DROP <span class="text-transparent bg-clip-text bg-gradient-to-r from-bbo to-bbo-light">ZONE</span></h1>
-            </div>
+          <div class="w-2 h-2 rounded-full bg-pink-hot"></div>
+          <span class="text-[10px] font-bold text-white/50 uppercase tracking-[0.15em]">Preview</span>
         </div>
-        <button onclick="openSettings()" class="text-gray-400 hover:text-white transition-colors">
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+        <button id="closePreview" class="text-white/25 hover:text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
-    </nav>
+      </div>
 
-    <!-- Main App Area -->
-    <main class="flex-1 flex flex-col lg:flex-row w-full max-w-7xl mx-auto p-4 lg:p-8 gap-6">
-        
-        <!-- Left: Upload & Input Panel -->
-        <div class="w-full lg:w-5/12 flex flex-col gap-5">
-            
-            <div class="glass-panel rounded-2xl p-5 border border-gray-800">
-                <h2 class="text-sm font-bold text-gray-300 uppercase tracking-widest mb-4">1. Drop Content</h2>
-                
-                <!-- Drag & Drop Area -->
-                <div id="dropZone" onclick="document.getElementById('fileInput').click()" class="drop-zone w-full h-56 rounded-xl bg-black/50 flex flex-col items-center justify-center cursor-pointer relative overflow-hidden group">
-                    <input type="file" id="fileInput" class="hidden" accept="image/*,video/mp4,video/webm,video/quicktime">
-                    
-                    <!-- Empty State -->
-                    <div id="dropPlaceholder" class="flex flex-col items-center justify-center text-center p-6 z-10">
-                        <div class="w-14 h-14 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center mb-3 group-hover:border-bbo transition-colors duration-300">
-                            <span class="text-2xl">📸</span>
-                        </div>
-                        <p class="font-bold text-white text-sm mb-1">Drag & Drop Media</p>
-                        <p class="text-xs text-gray-500 font-medium">Screenshots • Memes • Twitter Videos</p>
-                    </div>
+      <!-- Media Preview -->
+      <div id="previewMedia" class="bg-black flex items-center justify-center min-h-[180px] max-h-[420px] overflow-hidden"></div>
 
-                    <!-- Preview State -->
-                    <div id="previewContainer" class="hidden absolute inset-0 w-full h-full bg-black z-20">
-                        <img id="imagePreview" class="w-full h-full object-contain hidden" />
-                        <video id="videoPreview" class="w-full h-full object-contain hidden" controls></video>
-                        <button onclick="clearMedia(event)" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/80 backdrop-blur border border-white/20 flex items-center justify-center text-white hover:bg-bbo hover:border-bbo transition z-30">
-                            ✕
-                        </button>
-                    </div>
-                </div>
+      <!-- Config Section -->
+      <div class="p-5 space-y-5">
 
-                <div class="mt-5">
-                    <label class="text-xs font-bold text-gray-500 uppercase tracking-widest block mb-2">Or add context (Twitter Links / Text)</label>
-                    <textarea id="contextInput" rows="3" class="w-full bg-black border border-gray-800 rounded-xl p-3.5 text-white text-sm focus:outline-none focus:border-bbo focus:ring-1 focus:ring-bbo transition placeholder-gray-700 resize-none no-scrollbar font-medium" placeholder="Paste the tweet URL here, or describe the drama..."></textarea>
-                </div>
-
-                <button id="generateBtn" onclick="generateContent()" class="glow-btn w-full mt-5 py-4 rounded-xl text-white font-black text-sm tracking-wide flex justify-center items-center gap-2">
-                    <span>⚡ HYPE THIS UP</span>
-                </button>
+        <!-- AI HYPE BUTTON -->
+        <div id="aiHypeSection">
+          <button id="aiHypeBtn" class="btn-ai w-full py-3.5 rounded-xl text-sm font-black flex items-center justify-center gap-2.5 relative z-10">
+            <span class="text-base">⚡</span>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-hot to-pink-glow">AI HYPE ENGINE</span>
+            <span class="text-[9px] text-white/30 font-mono ml-1">— auto-generate captions</span>
+          </button>
+          <!-- AI Loading -->
+          <div id="aiLoading" class="hidden mt-3 glass-dark rounded-xl p-4 flex items-center gap-3">
+            <div class="spinner"></div>
+            <div>
+              <p class="text-xs font-bold text-pink-hot">Analyzing the culture...</p>
+              <p class="text-[10px] text-white/30 typing-dots"><span>.</span><span>.</span><span>.</span></p>
             </div>
-            
-            <div class="text-center px-4">
-                <p class="text-[10px] uppercase tracking-widest font-bold text-gray-600">The AI reads the image/video to generate hyper-specific broadcast polls.</p>
-            </div>
+          </div>
+          <!-- AI Results -->
+          <div id="aiResults" class="hidden mt-3 space-y-2.5"></div>
         </div>
 
-        <!-- Right: Results Panel -->
-        <div class="w-full lg:w-7/12 flex flex-col">
-            <div class="glass-panel rounded-2xl border border-gray-800 flex-1 flex flex-col relative overflow-hidden h-[600px]">
-                
-                <!-- Fixed Header for Results -->
-                <div class="px-6 py-4 border-b border-gray-800 bg-panel/50 backdrop-blur z-10 flex justify-between items-center">
-                    <h2 class="text-sm font-bold text-gray-300 uppercase tracking-widest">2. Broadcast Ammo</h2>
-                    <span id="resultCount" class="text-xs font-mono font-bold text-bbo bg-bbo/10 px-2 py-0.5 rounded">0 POSTS</span>
-                </div>
-
-                <!-- Scrollable Results Content -->
-                <div id="resultsContainer" class="flex-1 overflow-y-auto no-scrollbar p-6 space-y-4 relative">
-                    
-                    <!-- Empty State -->
-                    <div id="resultsEmpty" class="absolute inset-0 flex flex-col items-center justify-center text-center p-8">
-                        <div class="w-16 h-16 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center mb-4 text-3xl">
-                            📡
-                        </div>
-                        <h3 class="text-white font-bold text-lg mb-1">Waiting for drops...</h3>
-                        <p class="text-sm text-gray-500 font-medium max-w-xs">Drop media on the left, and the engine will cook up engaging polls, questions, and takes for your channel.</p>
-                    </div>
-
-                    <!-- Loading State -->
-                    <div id="resultsLoading" class="hidden absolute inset-0 bg-panel/90 backdrop-blur-sm flex flex-col items-center justify-center z-20">
-                        <div class="spinner mb-4"></div>
-                        <p class="text-bbo font-bold text-xs tracking-widest uppercase animate-pulse">Analyzing Culture...</p>
-                    </div>
-
-                    <!-- Generated Content injected here -->
-                </div>
-            </div>
+        <!-- Manual Caption -->
+        <div>
+          <label class="text-[10px] font-bold text-white/40 uppercase tracking-[0.15em] mb-2 block">Broadcast Caption</label>
+          <textarea id="captionInput" rows="2" placeholder="Write your take, or let AI cook above..." class="w-full bg-dark-700 border border-white/6 rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 focus:outline-none focus:border-pink-hot/30 resize-none transition-colors font-medium"></textarea>
         </div>
 
-    </main>
-
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="hidden fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-5 opacity-0 transition-opacity duration-300">
-        <div class="w-full max-w-md bg-panel rounded-2xl p-7 border border-gray-800 transform scale-95 transition-transform duration-300" id="settingsBox">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                    <svg class="w-5 h-5 text-bbo" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    Engine Settings
-                </h3>
-            </div>
-            
-            <div class="space-y-5">
-                <div>
-                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Gemini API Key</label>
-                    <input type="password" id="apiKeyInput" class="w-full bg-black border border-gray-800 rounded-xl p-4 text-white text-sm focus:outline-none focus:border-bbo focus:shadow-[0_0_15px_rgba(255,20,147,0.2)] transition font-mono" placeholder="AI Studio Key...">
-                    <p class="text-xs text-gray-500 mt-2 font-medium">Powering the visual analysis. <a href="https://aistudio.google.com/apikey" target="_blank" class="text-bbo hover:text-bbo-light transition">Get a free key</a></p>
-                </div>
-                
-                <div class="pt-2 flex gap-3">
-                    <button onclick="closeSettings()" class="flex-1 py-3.5 bg-gray-900 border border-gray-800 text-white font-bold rounded-xl hover:bg-gray-800 transition text-sm">Cancel</button>
-                    <button onclick="saveSettings()" class="flex-1 py-3.5 bg-white text-black font-black rounded-xl hover:bg-gray-200 transition text-sm shadow-[0_0_15px_rgba(255,255,255,0.2)]">SAVE KEY</button>
-                </div>
-            </div>
+        <!-- Quick Prompts -->
+        <div>
+          <label class="text-[10px] font-bold text-white/40 uppercase tracking-[0.15em] mb-2.5 block">Quick Prompts</label>
+          <div id="promptChips" class="flex flex-wrap gap-2">
+            <div class="prompt-chip px-3 py-1.5 rounded-full border border-white/8 text-[11px] font-semibold text-white/50" data-prompt="What y'all think about this?">What y'all think about this?</div>
+            <div class="prompt-chip px-3 py-1.5 rounded-full border border-white/8 text-[11px] font-semibold text-white/50" data-prompt="Be fr... is this valid?">Be fr... is this valid?</div>
+            <div class="prompt-chip px-3 py-1.5 rounded-full border border-white/8 text-[11px] font-semibold text-white/50" data-prompt="Clock this and tell me I'm wrong">Clock this and tell me I'm wrong</div>
+            <div class="prompt-chip px-3 py-1.5 rounded-full border border-white/8 text-[11px] font-semibold text-white/50" data-prompt="Hot take or cold take?">Hot take or cold take?</div>
+            <div class="prompt-chip px-3 py-1.5 rounded-full border border-white/8 text-[11px] font-semibold text-white/50" data-prompt="W or L?">W or L?</div>
+            <div class="prompt-chip px-3 py-1.5 rounded-full border border-white/8 text-[11px] font-semibold text-white/50" data-prompt="Rate this 1-10">Rate this 1-10</div>
+          </div>
         </div>
+
+        <!-- Reaction Sets -->
+        <div>
+          <label class="text-[10px] font-bold text-white/40 uppercase tracking-[0.15em] mb-2.5 block">Reactions</label>
+          <div class="flex gap-2.5 flex-wrap">
+            <button class="reaction-set btn-ghost px-3.5 py-2 rounded-xl text-sm selected" data-set="standard"><span class="text-base">🔥 💀 😭 🗣️ 💯</span></button>
+            <button class="reaction-set btn-ghost px-3.5 py-2 rounded-xl text-sm" data-set="vote"><span class="text-base">👍 👎 🤔 😤 🤷</span></button>
+            <button class="reaction-set btn-ghost px-3.5 py-2 rounded-xl text-sm" data-set="rate"><span class="text-base">⭐ ❌ ✅ 🏆 💩</span></button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3 pt-1">
+          <button id="addToQueueBtn" class="btn-pink flex-1 py-3 rounded-xl text-xs font-black tracking-wide">ADD TO QUEUE</button>
+          <button id="broadcastNowBtn" class="btn-ghost flex-1 py-3 rounded-xl text-xs font-bold text-pink-hot border-pink-hot/25">BROADCAST NOW</button>
+        </div>
+      </div>
     </div>
+  </section>
+</div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast class=bg-panel border border-gray-800 rounded-full px-6 py-3 text-sm font-bold flex items-center gap-3 shadow-[0_10px_40px_rgba(0,0,0,0.8)] glass-panel">
-        <span id="toastIcon" class="text-lg">📋</span>
-        <span id="toastMsg" class="text-white">Copied to clipboard!</span>
+<!-- ===== RIGHT COLUMN: QUEUE ===== -->
+<div class="w-full lg:w-[370px] flex flex-col gap-4">
+  <!-- Queue Header -->
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <h3 class="text-xs font-black tracking-tight">Broadcast Queue</h3>
+      <span id="queueCount" class="counter text-[9px] font-bold text-pink-hot bg-pink-hot/10 px-2 py-0.5 rounded-full">0</span>
     </div>
+    <div class="flex gap-0.5">
+      <button class="tab-btn active px-3 py-2 text-[10px] font-bold text-white/40 uppercase tracking-wider" data-tab="queue">Queue</button>
+      <button class="tab-btn px-3 py-2 text-[10px] font-bold text-white/40 uppercase tracking-wider" data-tab="sent">Sent</button>
+    </div>
+  </div>
 
-    <script>
-        // --- STATE & INITIALIZATION ---
-        let currentMedia = { dataBase64: null, mimeType: null };
-        const systemPrompt = `You are the content engine for BBO (Bad Bitches Only), an urban lifestyle brand run by King Maker. I am dropping a piece of urban media (image, video, or context text) into my Instagram Broadcast Channel. 
-        
-        Analyze the provided image, video, or text deeply. Figure out what the drama or topic is. 
-        Then, generate 4 different broadcast channel messages to drop alongside this media to GET PEOPLE TICKING AND VOTING.
+  <!-- Queue List -->
+  <div id="queueList" class="flex flex-col gap-2.5 pb-24 no-scroll overflow-y-auto" style="max-height:calc(100vh - 140px)">
+    <div id="emptyQueue" class="glass rounded-2xl p-8 text-center">
+      <div class="text-2xl mb-2 opacity-20">📡</div>
+      <p class="text-xs font-bold text-white/30 mb-1">Queue Empty</p>
+      <p class="text-[10px] text-white/15 font-medium">Drop content to load your broadcast</p>
+    </div>
+  </div>
 
-        Format requirements for the 4 outputs:
-        1. A spicy 2-Button Poll (A/B)
-        2. A "BBO Court" (Guilty/Not Guilty) scenario based on the media
-        3. A "Finish the line" related to the content
-        4. A polarizing hot take + "Agree or Disagree"
+  <!-- Sent List -->
+  <div id="sentList" class="hidden flex flex-col gap-2.5 pb-24 no-scroll overflow-y-auto" style="max-height:calc(100vh - 140px)">
+    <div id="emptySent" class="glass rounded-2xl p-8 text-center">
+      <div class="text-2xl mb-2 opacity-20">✅</div>
+      <p class="text-xs font-bold text-white/30 mb-1">Nothing Sent Yet</p>
+      <p class="text-[10px] text-white/15 font-medium">Broadcasts appear here</p>
+    </div>
+  </div>
+</div>
+</main>
 
-        RULES:
-        - NEVER ask open-ended questions. Only give tap options.
-        - Tone: confident, urban, unapologetic, baddie energy, polarizing.
-        - Keep EACH post under 3-4 lines MAX.
-        - Return each post separated by the exact string "===POST===" on its own line.
-        - Do not number them or add format labels. Just the raw text ready to copy-paste.`;
+<!-- ========== BROADCAST MODAL ========== -->
+<div id="broadcastModal" class="fixed inset-0 z-[100] hidden">
+<div class="absolute inset-0 bg-black/85 backdrop-blur-sm" id="modalOverlay"></div>
+<div class="relative z-10 flex items-center justify-center min-h-screen p-4">
+  <div class="glass-pink rounded-3xl w-full max-w-lg overflow-hidden anim-slide max-h-[90vh] overflow-y-auto no-scroll">
+    <div class="p-5 border-b border-pink-hot/10 flex items-center justify-between sticky top-0 glass-pink z-10">
+      <div class="flex items-center gap-3">
+        <div class="status-dot status-live"></div>
+        <span class="text-xs font-black text-pink-hot tracking-wider">BROADCASTING</span>
+      </div>
+      <button id="closeModal" class="text-white/30 hover:text-white transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="modalContent" class="p-5 space-y-4"></div>
+    <div class="px-5 pb-5 flex gap-3 sticky bottom-0 glass-pink pt-3">
+      <button id="copyBroadcast" class="btn-pink flex-1 py-3 rounded-xl text-xs font-black tracking-wide">COPY TO CLIPBOARD</button>
+      <button id="downloadBroadcast" class="btn-ghost flex-1 py-3 rounded-xl text-xs font-bold text-white/50">DOWNLOAD</button>
+    </div>
+  </div>
+</div>
+</div>
 
-        window.onload = () => {
-            const key = localStorage.getItem('bbo_gemini_key');
-            if (key) document.getElementById('apiKeyInput').value = key;
-            else openSettings();
-        };
+<!-- ========== SETTINGS MODAL ========== -->
+<div id="settingsModal" class="fixed inset-0 z-[110] hidden">
+<div class="absolute inset-0 bg-black/90 backdrop-blur-md" id="settingsOverlay"></div>
+<div class="relative z-10 flex items-center justify-center min-h-screen p-5">
+  <div class="glass rounded-2xl w-full max-w-md p-6 anim-slide" id="settingsBox">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-base font-black text-white flex items-center gap-2">
+        <span class="text-pink-hot">⚡</span> AI Engine Settings
+      </h3>
+      <button id="closeSettings" class="text-white/30 hover:text-white transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="space-y-5">
+      <div>
+        <label class="text-[10px] font-bold text-white/40 uppercase tracking-[0.15em] mb-2 block">Gemini API Key <span class="text-white/20">(optional)</span></label>
+        <input type="password" id="apiKeyInput" class="w-full bg-black border border-white/8 rounded-xl p-4 text-sm text-white focus:outline-none focus:border-pink-hot/40 transition font-mono placeholder-white/15" placeholder="Paste your Gemini key...">
+        <p class="text-[10px] text-white/25 mt-2 font-medium">Free from <a href="https://aistudio.google.com/apikey" target="_blank" class="text-pink-hot hover:text-pink-glow transition underline">Google AI Studio</a>. Enables the AI Hype Engine to auto-generate captions. <strong class="text-white/40">App works without it.</strong></p>
+      </div>
+      <div class="flex gap-3 pt-1">
+        <button id="settingsCancelBtn" class="btn-ghost flex-1 py-3 rounded-xl text-xs font-bold text-white/40">Cancel</button>
+        <button id="settingsSaveBtn" class="btn-pink flex-1 py-3 rounded-xl text-xs font-black">SAVE</button>
+      </div>
+      <button id="settingsRemoveKeyBtn" class="hidden w-full text-center text-[10px] text-red-400/50 hover:text-red-400 transition font-semibold pt-1">Remove API Key</button>
+    </div>
+  </div>
+</div>
+</div>
 
-        // --- DRAG AND DROP LOGIC ---
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
+<!-- ========== TOAST ========== -->
+<div id="toast" class="toast">
+<div class="glass-pink px-5 py-3 rounded-xl flex items-center gap-2.5 shadow-2xl">
+  <span id="toastIcon" class="text-base"></span>
+  <span id="toastMsg" class="text-xs font-bold"></span>
+</div>
+</div>
 
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, preventDefaults, false);
-            document.body.addEventListener(eventName, preventDefaults, false);
-        });
+<!-- ========================================= -->
+<!-- ============ JAVASCRIPT ================= -->
+<!-- ========================================= -->
+<script>
+(function(){
+'use strict';
 
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
+/* ========== STATE ========== */
+const state = {
+  queue: [],
+  sent: [],
+  currentPreview: null,
+  currentBroadcast: null,
+  selectedPrompt: '',
+  selectedReactionSet: 'standard',
+  activeTab: 'queue',
+  idCounter: 0,
+  aiGeneratedCaptions: [],
+  mediaBase64: null,
+  mediaMimeType: null
+};
+
+const reactionSets = {
+  standard: ['🔥','💀','😭','🗣️','💯'],
+  vote: ['👍','👎','🤔','😤','🤷'],
+  rate: ['⭐','❌','✅','🏆','💩']
+};
+
+const AI_SYSTEM_PROMPT = `You are the content engine for BBO (Bad Bitches Only), an urban lifestyle brand. The host is dropping media into an Instagram/WhatsApp Broadcast Channel and needs engagement captions.
+
+Analyze the provided image/video/text. Figure out the topic, drama, or vibe.
+Generate 4 different broadcast messages to post alongside this content:
+
+1. A spicy 2-option poll (A vs B)
+2. A "BBO Court" verdict (Guilty / Not Guilty) scenario based on the media
+3. A "Finish the sentence" prompt related to the content
+4. A polarizing hot take + "Agree or Disagree"
+
+RULES:
+- NEVER ask open-ended questions. Only give tap/vote options.
+- Tone: confident, urban, unapologetic, baddie energy, polarizing, funny
+- Keep EACH post under 3-4 lines MAX
+- Use strategic CAPS for emphasis
+- Light emoji usage (1-3 per post max)
+- Return each post separated by ===POST=== on its own line
+- No numbering, no format labels. Just raw text ready to copy-paste.`;
+
+/* ========== DOM REFS ========== */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+const dropZone = $('#dropZone');
+const fileInput = $('#fileInput');
+const browseBtn = $('#browseBtn');
+const pasteUrlBtn = $('#pasteUrlBtn');
+const urlInputWrap = $('#urlInputWrap');
+const urlInput = $('#urlInput');
+const urlAddBtn = $('#urlAddBtn');
+const urlCancelBtn = $('#urlCancelBtn');
+const previewPanel = $('#previewPanel');
+const previewMedia = $('#previewMedia');
+const captionInput = $('#captionInput');
+const closePreview = $('#closePreview');
+const addToQueueBtn = $('#addToQueueBtn');
+const broadcastNowBtn = $('#broadcastNowBtn');
+const aiHypeBtn = $('#aiHypeBtn');
+const aiLoading = $('#aiLoading');
+const aiResults = $('#aiResults');
+const queueList = $('#queueList');
+const sentList = $('#sentList');
+const queueCount = $('#queueCount');
+const emptyQueue = $('#emptyQueue');
+const emptySent = $('#emptySent');
+const clearAllBtn = $('#clearAllBtn');
+const liveIndicator = $('#liveIndicator');
+const aiStatusBadge = $('#aiStatusBadge');
+const broadcastModal = $('#broadcastModal');
+const modalOverlay = $('#modalOverlay');
+const closeModalBtn = $('#closeModal');
+const modalContent = $('#modalContent');
+const copyBroadcast = $('#copyBroadcast');
+const downloadBroadcast = $('#downloadBroadcast');
+const settingsBtn = $('#settingsBtn');
+const settingsModal = $('#settingsModal');
+const settingsOverlay = $('#settingsOverlay');
+const closeSettings = $('#closeSettings');
+const apiKeyInput = $('#apiKeyInput');
+const settingsSaveBtn = $('#settingsSaveBtn');
+const settingsCancelBtn = $('#settingsCancelBtn');
+const settingsRemoveKeyBtn = $('#settingsRemoveKeyBtn');
+
+/* ========== UTILITIES ========== */
+function genId(){ return ++state.idCounter; }
+function formatTime(){ return new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}); }
+function truncStr(s,n){ return s.length > n ? s.slice(0,n)+'...' : s; }
+
+function showToast(icon, msg){
+  $('#toastIcon').textContent = icon;
+  $('#toastMsg').textContent = msg;
+  const t = $('#toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function hasApiKey(){
+  const k = localStorage.getItem('bbo_gemini_key');
+  return k && k.trim().length > 10;
+}
+
+function updateAiBadge(){
+  aiStatusBadge.classList.toggle('hidden', !hasApiKey());
+  aiStatusBadge.classList.toggle('flex', hasApiKey());
+}
+
+/* ========== SETTINGS ========== */
+function openSettingsModal(){
+  const k = localStorage.getItem('bbo_gemini_key');
+  if(k) apiKeyInput.value = k;
+  settingsRemoveKeyBtn.classList.toggle('hidden', !k);
+  settingsModal.classList.remove('hidden');
+}
+
+function closeSettingsModal(){
+  settingsModal.classList.add('hidden');
+}
+
+settingsBtn.addEventListener('click', openSettingsModal);
+closeSettings.addEventListener('click', closeSettingsModal);
+settingsOverlay.addEventListener('click', closeSettingsModal);
+settingsCancelBtn.addEventListener('click', closeSettingsModal);
+
+settingsSaveBtn.addEventListener('click', () => {
+  const key = apiKeyInput.value.trim();
+  if(key){
+    localStorage.setItem('bbo_gemini_key', key);
+    showToast('⚡','AI Engine activated!');
+  } else {
+    localStorage.removeItem('bbo_gemini_key');
+    showToast('✅','Settings saved');
+  }
+  updateAiBadge();
+  closeSettingsModal();
+});
+
+settingsRemoveKeyBtn.addEventListener('click', () => {
+  localStorage.removeItem('bbo_gemini_key');
+  apiKeyInput.value = '';
+  settingsRemoveKeyBtn.classList.add('hidden');
+  updateAiBadge();
+  showToast('🗑️','API key removed');
+  closeSettingsModal();
+});
+
+/* ========== DRAG & DROP ========== */
+['dragenter','dragover'].forEach(e => {
+  dropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); dropZone.classList.add('drag-over'); });
+});
+['dragleave','drop'].forEach(e => {
+  dropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); dropZone.classList.remove('drag-over'); });
+});
+
+dropZone.addEventListener('drop', e => {
+  const files = e.dataTransfer.files;
+  if(files.length > 0){ handleFiles(files); return; }
+  const text = e.dataTransfer.getData('text/plain');
+  const html = e.dataTransfer.getData('text/html');
+  if(html){
+    const imgM = html.match(/<img[^>]+src="([^"]+)"/);
+    const vidM = html.match(/<video[^>]+src="([^"]+)"/);
+    if(imgM) handleUrl(imgM[1],'image');
+    else if(vidM) handleUrl(vidM[1],'video');
+    else if(text && text.startsWith('http')) handleUrl(text, guessType(text));
+    else showToast('⚠️','Could not detect media');
+  } else if(text && text.startsWith('http')){
+    handleUrl(text, guessType(text));
+  }
+});
+
+dropZone.addEventListener('click', e => {
+  if(e.target.closest('#browseBtn') || e.target.closest('.btn-ghost')) return;
+  fileInput.click();
+});
+browseBtn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); fileInput.click(); });
+
+function guessType(url){
+  const l = url.toLowerCase();
+  if(l.match(/\.(mp4|webm|mov|m3u8)/)) return 'video';
+  if(l.match(/\.(jpg|jpeg|png|gif|webp)/)) return 'image';
+  if(l.includes('video') || l.includes('ext_tw_video')) return 'video';
+  return 'image';
+}
+
+/* ========== FILE HANDLING ========== */
+fileInput.addEventListener('change', e => { if(e.target.files.length) handleFiles(e.target.files); });
+
+function handleFiles(fileList){
+  const files = Array.from(fileList).filter(f => f.type.startsWith('video/') || f.type.startsWith('image/'));
+  if(!files.length){ showToast('⚠️','No valid media found'); return; }
+  if(files.length === 1){ openPreview(files[0]); }
+  else { files.forEach((f,i) => setTimeout(() => openPreview(f, i > 0), i * 100)); }
+}
+
+function handleUrl(url, type){
+  const item = { type, url, name: url.split('/').pop().split('?')[0] || 'Linked Content', source: 'url' };
+  state.currentPreview = item;
+  state.mediaBase64 = null;
+  state.mediaMimeType = null;
+  showPreview(item);
+}
+
+function openPreview(file, autoQueue){
+  const url = URL.createObjectURL(file);
+  const type = file.type.startsWith('video/') ? 'video' : 'image';
+  const item = { type, url, name: file.name, file, source: 'file' };
+
+  if(autoQueue){
+    addItemToQueue(item,'','','standard');
+    showToast('📥',truncStr(file.name,25)+' queued');
+    return;
+  }
+
+  state.currentPreview = item;
+
+  // Read base64 for AI
+  const reader = new FileReader();
+  reader.onload = e => {
+    const b64 = e.target.result.split(',')[1];
+    state.mediaBase64 = b64;
+    state.mediaMimeType = file.type;
+  };
+  reader.readAsDataURL(file);
+
+  showPreview(item);
+}
+
+function showPreview(item){
+  previewPanel.classList.remove('hidden');
+  previewPanel.classList.add('anim-slide');
+  previewMedia.innerHTML = '';
+  aiResults.innerHTML = '';
+  aiResults.classList.add('hidden');
+  aiLoading.classList.add('hidden');
+  state.aiGeneratedCaptions = [];
+
+  if(item.type === 'video'){
+    const v = document.createElement('video');
+    v.src = item.url; v.controls = true; v.autoplay = false; v.muted = true; v.playsInline = true;
+    v.className = 'w-full'; v.style.maxHeight = '380px';
+    previewMedia.appendChild(v);
+  } else {
+    const img = document.createElement('img');
+    img.src = item.url; img.alt = item.name; img.className = 'media-preview w-full';
+    img.onerror = () => { img.remove(); previewMedia.innerHTML = '<div class="p-6 text-center text-white/20 text-xs">Could not load preview</div>'; };
+    previewMedia.appendChild(img);
+  }
+
+  captionInput.value = '';
+  state.selectedPrompt = '';
+  $$('.prompt-chip').forEach(c => c.classList.remove('selected'));
+  previewPanel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+/* ========== PREVIEW CONTROLS ========== */
+closePreview.addEventListener('click', () => {
+  previewPanel.classList.add('hidden');
+  previewMedia.innerHTML = '';
+  state.currentPreview = null;
+  state.mediaBase64 = null;
+  state.mediaMimeType = null;
+});
+
+$$('.prompt-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const was = chip.classList.contains('selected');
+    $$('.prompt-chip').forEach(c => c.classList.remove('selected'));
+    if(!was){ chip.classList.add('selected'); state.selectedPrompt = chip.dataset.prompt; captionInput.value = chip.dataset.prompt; }
+    else { state.selectedPrompt = ''; captionInput.value = ''; }
+  });
+});
+
+$$('.reaction-set').forEach(btn => {
+  btn.addEventListener('click', () => {
+    $$('.reaction-set').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    state.selectedReactionSet = btn.dataset.set;
+  });
+});
+
+/* ========== AI HYPE ENGINE ========== */
+aiHypeBtn.addEventListener('click', async () => {
+  if(!hasApiKey()){
+    openSettingsModal();
+    showToast('⚡','Add your free Gemini key to unlock AI');
+    return;
+  }
+  if(!state.currentPreview){
+    showToast('⚠️','Drop content first');
+    return;
+  }
+
+  aiLoading.classList.remove('hidden');
+  aiResults.innerHTML = '';
+  aiResults.classList.add('hidden');
+  aiHypeBtn.style.pointerEvents = 'none';
+  aiHypeBtn.style.opacity = '0.5';
+
+  const apiKey = localStorage.getItem('bbo_gemini_key');
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+  let parts = [{ text: AI_SYSTEM_PROMPT }];
+
+  // Add image/video if we have base64 (files only — URLs can't be inlined)
+  if(state.mediaBase64 && state.mediaMimeType){
+    // For large files, compress or skip
+    const sizeKB = (state.mediaBase64.length * 3/4) / 1024;
+    if(sizeKB < 4000){
+      parts.push({ inlineData: { mimeType: state.mediaMimeType, data: state.mediaBase64 }});
+    } else {
+      parts.push({ text: '[Media file was too large for inline analysis. Generating based on any context text provided.]' });
+    }
+  }
+
+  const contextText = captionInput.value.trim();
+  if(contextText){
+    parts.push({ text: `Additional context from user: ${contextText}` });
+  }
+
+  if(!state.mediaBase64 && !contextText){
+    parts.push({ text: 'The user dropped a URL-based media file. Generate generic urban engagement content for a broadcast channel.' });
+  }
+
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts }],
+        generationConfig: { temperature: 1.1, maxOutputTokens: 1024 }
+      })
+    });
+
+    if(!resp.ok){
+      const errText = await resp.text();
+      if(errText.includes('API key') || errText.includes('API_KEY_INVALID')){
+        throw new Error('Invalid API key — check settings');
+      }
+      if(errText.includes('too large') || errText.includes('payload')){
+        throw new Error('File too large — try a screenshot instead');
+      }
+      throw new Error('API error — try again');
+    }
+
+    const data = await resp.json();
+    const text = data.candidates[0].content.parts[0].text;
+    const posts = text.split('===POST===').map(p => p.trim()).filter(p => p.length > 5);
+
+    state.aiGeneratedCaptions = posts;
+    renderAiResults(posts);
+
+  } catch(err){
+    console.error(err);
+    showToast('❌', err.message);
+  } finally {
+    aiLoading.classList.add('hidden');
+    aiHypeBtn.style.pointerEvents = '';
+    aiHypeBtn.style.opacity = '';
+  }
+});
+
+function renderAiResults(posts){
+  aiResults.innerHTML = '';
+  aiResults.classList.remove('hidden');
+
+  const header = document.createElement('div');
+  header.className = 'flex items-center justify-between mb-1';
+  header.innerHTML = `
+    <span class="text-[10px] font-bold text-pink-hot uppercase tracking-[0.15em]">⚡ AI Generated — tap to use</span>
+    <span class="counter text-[9px] font-bold text-white/20">${posts.length} READY</span>
+  `;
+  aiResults.appendChild(header);
+
+  posts.forEach((post, i) => {
+    const card = document.createElement('div');
+    card.className = 'ai-card glass-dark rounded-xl p-4 cursor-pointer anim-slide';
+    card.style.animationDelay = `${i * 0.08}s`;
+
+    const safeHtml = post.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+
+    card.innerHTML = `
+      <div class="flex gap-3">
+        <div class="w-6 h-6 rounded-full bg-dark-600 border border-white/5 flex items-center justify-center shrink-0">
+          <span class="counter text-[9px] font-bold text-white/30">0${i+1}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-[13px] text-white/80 leading-relaxed font-medium mb-3">${safeHtml}</p>
+          <div class="flex gap-2">
+            <button class="ai-use-btn text-[9px] font-bold text-pink-hot bg-pink-hot/8 hover:bg-pink-hot/15 px-3 py-1.5 rounded-lg transition uppercase tracking-wider">Use This</button>
+            <button class="ai-copy-btn text-[9px] font-bold text-white/30 hover:text-white/60 bg-white/3 hover:bg-white/6 px-3 py-1.5 rounded-lg transition uppercase tracking-wider">Copy</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    card.querySelector('.ai-use-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      captionInput.value = post;
+      $$('.prompt-chip').forEach(c => c.classList.remove('selected'));
+      showToast('✅','Caption loaded');
+      captionInput.scrollIntoView({behavior:'smooth',block:'center'});
+    });
+
+    card.querySelector('.ai-copy-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      navigator.clipboard.writeText(post).then(() => showToast('📋','Copied!'));
+    });
+
+    card.addEventListener('click', () => {
+      captionInput.value = post;
+      $$('.prompt-chip').forEach(c => c.classList.remove('selected'));
+      showToast('✅','Caption loaded');
+    });
+
+    aiResults.appendChild(card);
+  });
+}
+
+/* ========== QUEUE MANAGEMENT ========== */
+function createQueueItem(media, caption, prompt, reactionSet){
+  return {
+    id: genId(),
+    media,
+    caption: caption || prompt || "What y'all think about this?",
+    prompt,
+    reactionSet,
+    reactions: reactionSets[reactionSet],
+    status: 'queued',
+    addedAt: formatTime(),
+    sentAt: null
+  };
+}
+
+function addItemToQueue(media, caption, prompt, reactionSet){
+  const item = createQueueItem(media, caption, prompt, reactionSet);
+  state.queue.push(item);
+  renderQueue();
+  updateCount();
+}
+
+function removeFromQueue(id){
+  state.queue = state.queue.filter(i => i.id !== id);
+  renderQueue();
+  updateCount();
+}
+
+function moveToSent(item){
+  item.status = 'sent';
+  item.sentAt = formatTime();
+  state.sent.unshift(item);
+  state.queue = state.queue.filter(i => i.id !== item.id);
+  renderQueue();
+  renderSent();
+  updateCount();
+}
+
+function updateCount(){
+  queueCount.textContent = state.queue.length;
+  const hasLive = state.queue.some(i => i.status === 'live');
+  liveIndicator.classList.toggle('hidden', !hasLive);
+  liveIndicator.classList.toggle('flex', hasLive);
+}
+
+addToQueueBtn.addEventListener('click', () => {
+  if(!state.currentPreview) return;
+  addItemToQueue(state.currentPreview, captionInput.value.trim(), state.selectedPrompt, state.selectedReactionSet);
+  showToast('📥','Added to queue');
+  previewPanel.classList.add('hidden');
+  previewMedia.innerHTML = '';
+  state.currentPreview = null;
+});
+
+broadcastNowBtn.addEventListener('click', () => {
+  if(!state.currentPreview) return;
+  const item = createQueueItem(state.currentPreview, captionInput.value.trim(), state.selectedPrompt, state.selectedReactionSet);
+  item.status = 'live';
+  doBroadcast(item);
+  previewPanel.classList.add('hidden');
+  previewMedia.innerHTML = '';
+  state.currentPreview = null;
+});
+
+/* ========== RENDER QUEUE ========== */
+function renderQueue(){
+  queueList.querySelectorAll('.queue-card').forEach(c => c.remove());
+  emptyQueue.classList.toggle('hidden', state.queue.length > 0);
+
+  state.queue.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = `queue-card glass rounded-xl p-3 flex gap-3 anim-slide ${item.status === 'live' ? 'live' : ''}`;
+    card.dataset.id = item.id;
+    card.style.animationDelay = `${idx * 40}ms`;
+
+    const isVid = item.media.type === 'video';
+    card.innerHTML = `
+      <div class="media-thumb w-14 h-14 rounded-lg bg-dark-700 flex-shrink-0 overflow-hidden relative">
+        ${isVid
+          ? `<video src="${item.media.url}" class="w-full h-full object-cover" muted></video>
+             <div class="absolute inset-0 flex items-center justify-center z-10">
+               <div class="w-5 h-5 rounded-full bg-black/60 flex items-center justify-center">
+                 <svg class="w-2.5 h-2.5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+               </div>
+             </div>`
+          : `<img src="${item.media.url}" class="w-full h-full object-cover" alt="">`
         }
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-start justify-between gap-2 mb-0.5">
+          <p class="text-[11px] font-semibold text-white/70 leading-snug line-clamp-2">${truncStr(item.caption, 80)}</p>
+          <div class="status-dot flex-shrink-0 ${item.status === 'live' ? 'status-live' : 'status-queued'}"></div>
+        </div>
+        <div class="flex items-center gap-1 mb-1.5">${item.reactions.map(r => `<span class="text-[10px]">${r}</span>`).join('')}</div>
+        <div class="flex items-center gap-2">
+          <button class="bc-btn text-[9px] font-bold text-pink-hot hover:text-pink-glow transition uppercase tracking-wider" data-id="${item.id}">${item.status === 'live' ? 'View' : 'Broadcast'}</button>
+          <span class="text-white/8">|</span>
+          <button class="rm-btn text-[9px] font-medium text-white/20 hover:text-red-400 transition uppercase tracking-wider" data-id="${item.id}">Remove</button>
+          ${idx > 0 ? `<span class="text-white/8">|</span><button class="up-btn text-[9px] font-medium text-white/20 hover:text-white/50 transition uppercase tracking-wider" data-id="${item.id}">↑</button>` : ''}
+        </div>
+      </div>
+    `;
+    queueList.appendChild(card);
+  });
 
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
-        });
+  bindQueueActions();
+}
 
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
-        });
+function renderSent(){
+  sentList.querySelectorAll('.queue-card').forEach(c => c.remove());
+  emptySent.classList.toggle('hidden', state.sent.length > 0);
 
-        dropZone.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            if (files.length) handleFile(files[0]);
-        });
+  state.sent.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'queue-card glass rounded-xl p-3 flex gap-3 anim-slide opacity-60';
+    card.style.animationDelay = `${idx * 40}ms`;
+    const isVid = item.media.type === 'video';
+    card.innerHTML = `
+      <div class="media-thumb w-14 h-14 rounded-lg bg-dark-700 flex-shrink-0 overflow-hidden">
+        ${isVid ? `<video src="${item.media.url}" class="w-full h-full object-cover" muted></video>` : `<img src="${item.media.url}" class="w-full h-full object-cover" alt="">`}
+      </div>
+      <div class="flex-1 min-w-0">
+        <p class="text-[11px] font-semibold text-white/50 leading-snug line-clamp-2 mb-1">${truncStr(item.caption, 80)}</p>
+        <div class="flex items-center gap-2 text-[9px] text-white/25">
+          <span>Sent ${item.sentAt}</span>
+          <span class="text-green-400/50">✓</span>
+        </div>
+      </div>
+    `;
+    sentList.appendChild(card);
+  });
+}
 
-        fileInput.addEventListener('change', function() {
-            if (this.files.length) handleFile(this.files[0]);
-        });
+function bindQueueActions(){
+  queueList.querySelectorAll('.bc-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = state.queue.find(i => i.id === parseInt(btn.dataset.id));
+      if(item) doBroadcast(item);
+    });
+  });
+  queueList.querySelectorAll('.rm-btn').forEach(btn => {
+    btn.addEventListener('click', () => { removeFromQueue(parseInt(btn.dataset.id)); showToast('🗑️','Removed'); });
+  });
+  queueList.querySelectorAll('.up-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = state.queue.findIndex(i => i.id === parseInt(btn.dataset.id));
+      if(idx > 0){ [state.queue[idx-1], state.queue[idx]] = [state.queue[idx], state.queue[idx-1]]; renderQueue(); }
+    });
+  });
+}
 
-        function handleFile(file) {
-            const validImageTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
-            const validVideoTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
-            
-            if (!validImageTypes.includes(file.type) && !validVideoTypes.includes(file.type)) {
-                return showToast('Please drop an image or MP4 video', true);
-            }
+/* ========== TABS ========== */
+$$('.tab-btn').forEach(tab => {
+  tab.addEventListener('click', () => {
+    $$('.tab-btn').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    state.activeTab = tab.dataset.tab;
+    queueList.classList.toggle('hidden', state.activeTab !== 'queue');
+    sentList.classList.toggle('hidden', state.activeTab !== 'sent');
+  });
+});
 
-            const isVideo = validVideoTypes.includes(file.type);
-            const reader = new FileReader();
-            
-            reader.onload = (e) => {
-                const base64Str = e.target.result.split(',')[1];
-                currentMedia = { dataBase64: base64Str, mimeType: file.type };
-                
-                // UI Updates
-                document.getElementById('dropPlaceholder').classList.add('hidden');
-                document.getElementById('previewContainer').classList.remove('hidden');
-                
-                const imgPreview = document.getElementById('imagePreview');
-                const vidPreview = document.getElementById('videoPreview');
-                
-                if (isVideo) {
-                    imgPreview.classList.add('hidden');
-                    vidPreview.classList.remove('hidden');
-                    vidPreview.src = e.target.result;
-                } else {
-                    vidPreview.classList.add('hidden');
-                    imgPreview.classList.remove('hidden');
-                    imgPreview.src = e.target.result;
-                }
-            };
-            
-            reader.readAsDataURL(file);
-        }
+/* ========== BROADCAST ========== */
+function doBroadcast(item){
+  broadcastModal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
 
-        function clearMedia(e) {
-            if(e) e.stopPropagation();
-            currentMedia = { dataBase64: null, mimeType: null };
-            fileInput.value = '';
-            document.getElementById('previewContainer').classList.add('hidden');
-            document.getElementById('dropPlaceholder').classList.remove('hidden');
-            document.getElementById('imagePreview').src = '';
-            document.getElementById('videoPreview').src = '';
-        }
+  const isVid = item.media.type === 'video';
+  modalContent.innerHTML = `
+    <div class="rounded-xl overflow-hidden bg-black">
+      ${isVid
+        ? `<video src="${item.media.url}" controls autoplay muted playsinline class="w-full" style="max-height:280px"></video>`
+        : `<img src="${item.media.url}" class="w-full" style="max-height:280px;object-fit:contain" alt="">`
+      }
+    </div>
+    <div class="glass-dark rounded-xl p-4">
+      <p class="text-sm font-bold mb-3 leading-relaxed">${item.caption}</p>
+      <div class="flex items-center gap-2 mb-3">
+        ${item.reactions.map(r => `<button class="reaction-btn w-10 h-10 rounded-xl border border-white/8 flex items-center justify-center text-lg hover:bg-pink-hot/10" data-r="${r}">${r}</button>`).join('')}
+      </div>
+      <div class="h-1 rounded-full bg-white/5 overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-pink-hot to-pink-glow w-0 transition-all duration-1000" id="engBar"></div></div>
+    </div>
+    <div class="flex items-center justify-between text-[10px] text-white/20">
+      <span class="counter font-bold">BBO BROADCAST CHANNEL</span>
+      <span class="counter">${formatTime()}</span>
+    </div>
+  `;
 
-        // --- API INTEGRATION ---
-        async function generateContent() {
-            const apiKey = localStorage.getItem('bbo_gemini_key');
-            if (!apiKey) return openSettings();
+  setTimeout(() => { const bar = document.getElementById('engBar'); if(bar) bar.style.width = '100%'; }, 200);
 
-            const contextText = document.getElementById('contextInput').value.trim();
-            
-            if (!currentMedia.dataBase64 && !contextText) {
-                return showToast('Drop an image/video or paste some text first!', true);
-            }
+  modalContent.querySelectorAll('.reaction-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('picked');
+      if(btn.classList.contains('picked') && !btn.querySelector('.counter')){
+        const c = document.createElement('span');
+        c.className = 'counter text-[8px] text-white/40 ml-0.5';
+        c.textContent = Math.floor(Math.random()*80+15);
+        btn.appendChild(c);
+      } else if(!btn.classList.contains('picked')){
+        const ex = btn.querySelector('.counter');
+        if(ex) ex.remove();
+      }
+    });
+  });
 
-            // Setup UI for Loading
-            document.getElementById('resultsEmpty').classList.add('hidden');
-            const resultsContainer = document.getElementById('resultsContainer');
-            const loadingOverlay = document.getElementById('resultsLoading');
-            loadingOverlay.classList.remove('hidden');
-            
-            // Build Gemini Payload
-            // Note using Gemini 1.5 Flash as it handles inline images/video well
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-            
-            let parts = [{ text: systemPrompt }];
-            
-            if (currentMedia.dataBase64) {
-                parts.push({
-                    inlineData: {
-                        mimeType: currentMedia.mimeType,
-                        data: currentMedia.dataBase64
-                    }
-                });
-            }
-            
-            if (contextText) {
-                parts.push({ text: `Additional context or link from user: ${contextText}` });
-            }
+  state.currentBroadcast = item;
+  if(!state.sent.find(s => s.id === item.id)){
+    moveToSent(item);
+    showToast('📡','Content broadcasted!');
+  }
+}
 
-            const requestBody = {
-                contents: [{ parts: parts }],
-                generationConfig: { temperature: 1.1 },
-                tools: [{ googleSearch: {} }] // Allow it to search if a link is dropped
-            };
+function closeBroadcastModal(){
+  broadcastModal.classList.add('hidden');
+  document.body.style.overflow = '';
+}
 
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(requestBody)
-                });
+closeModalBtn.addEventListener('click', closeBroadcastModal);
+modalOverlay.addEventListener('click', closeBroadcastModal);
 
-                if (!response.ok) {
-                    const errorData = await response.text();
-                    throw new Error(errorData.includes('API key') ? 'Invalid API Key' : 'File might be too large or API error');
-                }
+/* ========== COPY / DOWNLOAD ========== */
+copyBroadcast.addEventListener('click', async () => {
+  const item = state.currentBroadcast;
+  if(!item) return;
+  const text = `${item.caption}\n\nReact: ${item.reactions.join(' ')}\n\n📡 BBO Broadcast Channel`;
+  try {
+    if(item.media.source === 'file' && item.media.file && item.media.type === 'image'){
+      const resp = await fetch(item.media.url);
+      const blob = await resp.blob();
+      await navigator.clipboard.write([new ClipboardItem({'text/plain': new Blob([text],{type:'text/plain'}), [blob.type]: blob})]);
+      showToast('✅','Image + caption copied!');
+    } else {
+      await navigator.clipboard.writeText(text);
+      showToast('✅','Caption copied!');
+    }
+  } catch(e){
+    try { await navigator.clipboard.writeText(text); showToast('✅','Caption copied!'); } catch(e2){ showToast('⚠️','Could not copy'); }
+  }
+});
 
-                const data = await response.json();
-                const text = data.candidates[0].content.parts[0].text;
-                
-                // Parse Posts
-                const posts = text.split('===POST===')
-                                  .map(p => p.trim())
-                                  .filter(p => p.length > 5);
-                
-                renderResults(posts);
-                
-            } catch (err) {
-                console.error(err);
-                showToast('❌ ' + err.message, true);
-                if(resultsContainer.children.length <= 2) {
-                    document.getElementById('resultsEmpty').classList.remove('hidden');
-                }
-            } finally {
-                loadingOverlay.classList.add('hidden');
-            }
-        }
+downloadBroadcast.addEventListener('click', () => {
+  const item = state.currentBroadcast;
+  if(!item || !item.media.url) return;
+  const a = document.createElement('a');
+  a.href = item.media.url;
+  a.download = `bbo-broadcast-${item.id}.${item.media.type === 'video' ? 'mp4' : 'png'}`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast('💾','Download started');
+});
 
-        function renderResults(posts) {
-            const container = document.getElementById('resultsContainer');
-            
-            // Remove old generated posts, keep empty/loading states
-            Array.from(container.children).forEach(child => {
-                if(child.id !== 'resultsEmpty' && child.id !== 'resultsLoading') {
-                    child.remove();
-                }
-            });
+/* ========== URL INPUT ========== */
+pasteUrlBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  urlInputWrap.classList.toggle('hidden');
+  if(!urlInputWrap.classList.contains('hidden')) urlInput.focus();
+});
+urlCancelBtn.addEventListener('click', () => { urlInputWrap.classList.add('hidden'); urlInput.value = ''; });
+urlAddBtn.addEventListener('click', () => {
+  const u = urlInput.value.trim();
+  if(!u) return;
+  handleUrl(u, guessType(u));
+  urlInputWrap.classList.add('hidden');
+  urlInput.value = '';
+});
+urlInput.addEventListener('keydown', e => { if(e.key === 'Enter') urlAddBtn.click(); });
 
-            document.getElementById('resultCount').textContent = `${posts.length} READY`;
+/* ========== CLEAR ALL ========== */
+clearAllBtn.addEventListener('click', () => {
+  if(!state.queue.length && !state.sent.length) return;
+  state.queue = []; state.sent = [];
+  renderQueue(); renderSent(); updateCount();
+  previewPanel.classList.add('hidden'); previewMedia.innerHTML = '';
+  state.currentPreview = null;
+  showToast('🧹','Cleared');
+});
 
-            posts.forEach((post, index) => {
-                const safePostText = post.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
-                const rawTextEncoded = encodeURIComponent(post); // for safely passing to copy function
-                
-                const card = document.createElement('div');
-                card.className = `glass-panel rounded-xl p-5 border border-gray-800 animate-slide bg-black/40 hover:bg-black/60 transition-colors`;
-                card.style.animationDelay = `${index * 0.1}s`;
-                
-                card.innerHTML = `
-                    <div class="flex items-start gap-4">
-                        <div class="w-8 h-8 rounded-full bg-gray-900 border border-gray-800 flex items-center justify-center shrink-0 font-mono text-xs font-bold text-gray-400">
-                            0${index + 1}
-                        </div>
-                        <div class="flex-1">
-                            <p class="text-white text-sm leading-relaxed font-medium font-sans mb-4">${safePostText}</p>
-                            <button onclick="copyToClipboard(this, decodeURIComponent('${rawTextEncoded}'))" class="py-2.5 px-4 rounded-lg bg-gray-900 border border-gray-800 hover:border-bbo hover:text-bbo text-gray-300 text-xs font-bold transition flex items-center justify-center gap-2 w-full sm:w-auto">
-                                📋 COPY TEXT
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
+/* ========== PASTE FROM CLIPBOARD ========== */
+document.addEventListener('paste', async e => {
+  if(document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+  const items = e.clipboardData.items;
+  for(let i = 0; i < items.length; i++){
+    if(items[i].type.startsWith('image/')){
+      const file = items[i].getAsFile();
+      if(file){ openPreview(file); showToast('📋','Pasted from clipboard'); return; }
+    }
+  }
+  const text = e.clipboardData.getData('text/plain');
+  if(text && text.startsWith('http')){ handleUrl(text, guessType(text)); showToast('🔗','URL pasted'); }
+});
 
-        function copyToClipboard(btn, text) {
-            navigator.clipboard.writeText(text).then(() => {
-                const originalHtml = btn.innerHTML;
-                btn.innerHTML = '✅ COPIED!';
-                btn.classList.add('bg-bbo/10', 'border-bbo', 'text-bbo');
-                showToast('Ready for Broadcast 📡');
-                
-                setTimeout(() => {
-                    btn.innerHTML = originalHtml;
-                    btn.classList.remove('bg-bbo/10', 'border-bbo', 'text-bbo');
-                }, 2000);
-            });
-        }
+/* ========== KEYBOARD ========== */
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    if(!settingsModal.classList.contains('hidden')) closeSettingsModal();
+    else if(!broadcastModal.classList.contains('hidden')) closeBroadcastModal();
+    else if(!previewPanel.classList.contains('hidden')){ previewPanel.classList.add('hidden'); previewMedia.innerHTML = ''; state.currentPreview = null; }
+  }
+});
 
-        // --- UI UTILS ---
-        const settingsModal = document.getElementById('settingsModal');
-        const settingsBox = document.getElementById('settingsBox');
+/* ========== INIT ========== */
+updateCount();
+updateAiBadge();
 
-        function openSettings() {
-            settingsModal.classList.remove('hidden');
-            setTimeout(() => {
-                settingsModal.classList.remove('opacity-0');
-                settingsBox.classList.remove('scale-95');
-            }, 10);
-        }
-
-        function closeSettings() {
-            settingsModal.classList.add('opacity-0');
-            settingsBox.classList.add('scale-95');
-            setTimeout(() => {
-                settingsModal.classList.add('hidden');
-            }, 300);
-        }
-
-        function saveSettings() {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            if (!key) return showToast('API Key is required', true);
-            localStorage.setItem('bbo_gemini_key', key);
-            closeSettings();
-            showToast('Engine Ready ⚡');
-        }
-
-        function showToast(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastIcon').textContent = isError ? '❌' : '📋';
-            document.getElementById('toastMsg').textContent = msg;
-            
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-    </script>
+})();
+</script>
 </body>
 </html>
