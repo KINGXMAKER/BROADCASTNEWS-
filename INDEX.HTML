@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBO Broadcast Drop</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        pink: { hot: '#FF1493', glow: '#FF69B4', dim: '#990D58' },
+        dark: { 900: '#080808', 800: '#111111', 700: '#1a1a1a', 600: '#222222', 500: '#2a2a2a' }
+      },
+      fontFamily: {
+        inter: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace']
+      }
+    }
+  }
+}
+</script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #080808; color: #fff; overflow-x: hidden; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #111; }
+  ::-webkit-scrollbar-thumb { background: #FF1493; border-radius: 3px; }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .glass-pink {
+    background: rgba(255, 20, 147, 0.06);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 20, 147, 0.15);
+  }
+
+  .drop-zone {
+    border: 2px dashed rgba(255, 20, 147, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .drop-zone.drag-over {
+    border-color: #FF1493;
+    background: rgba(255, 20, 147, 0.08);
+    box-shadow: 0 0 40px rgba(255, 20, 147, 0.15), inset 0 0 40px rgba(255, 20, 147, 0.05);
+    transform: scale(1.01);
+  }
+  .drop-zone.drag-over .drop-icon { animation: pulse-pink 1s infinite; }
+
+  @keyframes pulse-pink {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.15); opacity: 1; }
+  }
+  @keyframes slide-up {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 20, 147, 0.2); }
+    50% { box-shadow: 0 0 35px rgba(255, 20, 147, 0.4); }
+  }
+
+  .animate-in { animation: slide-up 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+  .fade-in { animation: fade-in 0.3s ease forwards; }
+
+  .btn-pink {
+    background: linear-gradient(135deg, #FF1493, #CC1177);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-pink:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 30px rgba(255, 20, 147, 0.35);
+  }
+  .btn-pink:active { transform: translateY(0); }
+
+  .btn-ghost {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    transition: all 0.25s ease;
+  }
+  .btn-ghost:hover {
+    border-color: rgba(255, 20, 147, 0.4);
+    background: rgba(255, 20, 147, 0.06);
+  }
+
+  .queue-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: grab;
+  }
+  .queue-card:hover {
+    transform: translateX(4px);
+    border-color: rgba(255, 20, 147, 0.3);
+  }
+  .queue-card.dragging { opacity: 0.4; transform: scale(0.97); }
+  .queue-card.live { animation: glow-pulse 2s infinite; border-color: #FF1493; }
+
+  .reaction-btn {
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .reaction-btn:hover { transform: scale(1.2); }
+  .reaction-btn:active { transform: scale(0.9); }
+  .reaction-btn.selected {
+    background: rgba(255, 20, 147, 0.15);
+    border-color: rgba(255, 20, 147, 0.5);
+  }
+
+  .tab-btn {
+    transition: all 0.25s ease;
+    position: relative;
+  }
+  .tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #FF1493;
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
+  }
+  .tab-btn.active { color: #FF1493; }
+  .tab-btn.active::after { transform: scaleX(1); }
+
+  .media-thumb {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .media-thumb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .media-thumb:hover { transform: scale(1.03); }
+
+  .engagement-bar {
+    background: linear-gradient(90deg, #FF1493, #FF69B4, #FF1493);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .status-live { background: #FF1493; box-shadow: 0 0 8px #FF1493; animation: pulse-pink 2s infinite; }
+  .status-queued { background: #FFD700; }
+  .status-draft { background: rgba(255, 255, 255, 0.3); }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  video { max-height: 400px; }
+  img.preview { max-height: 400px; object-fit: contain; }
+
+  .prompt-chip {
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .prompt-chip:hover {
+    background: rgba(255, 20, 147, 0.15);
+    border-color: rgba(255, 20, 147, 0.5);
+    transform: translateY(-1px);
+  }
+  .prompt-chip.selected {
+    background: rgba(255, 20, 147, 0.2);
+    border-color: #FF1493;
+    color: #FF1493;
+  }
+
+  .counter { font-family: 'JetBrains Mono', monospace; }
+</style>
+</head>
+<body class="min-h-screen font-inter">
+
+<!-- HEADER -->
+<header class="sticky top-0 z-50 glass border-b border-white/5">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-pink-hot to-pink-dim flex items-center justify-center font-black text-sm tracking-tight">
+        BBO
+      </div>
+      <div>
+        <h1 class="text-sm font-bold tracking-tight leading-none">BROADCAST DROP</h1>
+        <p class="text-[10px] text-white/40 font-medium tracking-widest uppercase">Content Command Center</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div id="liveIndicator" class="hidden items-center gap-2 px-3 py-1.5 rounded-full glass-pink">
+        <div class="status-dot status-live"></div>
+        <span class="text-xs font-semibold text-pink-hot">LIVE</span>
+      </div>
+      <button id="clearAllBtn" class="btn-ghost px-3 py-1.5 rounded-lg text-xs font-medium text-white/50 hover:text-white">
+        Clear All
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN LAYOUT -->
+<main class="max-w-7xl mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
+
+  <!-- LEFT COLUMN: DROP + PREVIEW -->
+  <div class="flex-1 flex flex-col gap-6 min-w-0">
+
+    <!-- DROP ZONE -->
+    <section id="dropZone" class="drop-zone rounded-2xl p-8 md:p-12 flex flex-col items-center justify-center text-center min-h-[260px] relative">
+      <div class="drop-icon mb-4">
+        <svg class="w-16 h-16 text-pink-hot/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+        </svg>
+      </div>
+      <h2 class="text-lg font-bold mb-1">Drop That Content</h2>
+      <p class="text-sm text-white/40 mb-5 max-w-sm">Drag videos, screenshots, or screen recordings straight from Twitter into the broadcast queue</p>
+      <div class="flex items-center gap-3">
+        <label class="btn-pink px-5 py-2.5 rounded-xl text-sm font-semibold cursor-pointer">
+          Browse Files
+          <input type="file" id="fileInput" multiple accept="video/*,image/*" class="hidden">
+        </label>
+        <button id="pasteBtn" class="btn-ghost px-5 py-2.5 rounded-xl text-sm font-medium text-white/60">
+          Paste URL
+        </button>
+      </div>
+      <p class="text-[10px] text-white/20 mt-4 font-mono">MP4 · MOV · WEBM · PNG · JPG · GIF</p>
+    </section>
+
+    <!-- URL INPUT (hidden by default) -->
+    <div id="urlInputWrap" class="hidden animate-in">
+      <div class="glass rounded-xl p-4 flex gap-3">
+        <input id="urlInput" type="url" placeholder="Paste Twitter/X video URL or image link..." class="flex-1 bg-transparent border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-pink-hot/50 transition-colors">
+        <button id="urlSubmitBtn" class="btn-pink px-5 py-2.5 rounded-lg text-sm font-semibold">Add</button>
+        <button id="urlCancelBtn" class="btn-ghost px-4 py-2.5 rounded-lg text-sm text-white/50">Cancel</button>
+      </div>
+    </div>
+
+    <!-- PREVIEW PANEL -->
+    <section id="previewPanel" class="hidden">
+      <div class="glass rounded-2xl overflow-hidden">
+        <!-- Preview Header -->
+        <div class="px-5 py-3 border-b border-white/5 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-pink-hot"></div>
+            <span class="text-xs font-semibold text-white/60 uppercase tracking-wider">Preview</span>
+          </div>
+          <button id="closePreview" class="text-white/30 hover:text-white transition-colors">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Media Preview -->
+        <div id="previewMedia" class="bg-black flex items-center justify-center min-h-[200px] max-h-[450px] overflow-hidden">
+        </div>
+
+        <!-- Engagement Config -->
+        <div class="p-5 space-y-5">
+          <!-- Caption -->
+          <div>
+            <label class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-2 block">Broadcast Caption</label>
+            <textarea id="captionInput" rows="2" placeholder="What's the move? Drop your take on this..." class="w-full bg-dark-700 border border-white/8 rounded-xl px-4 py-3 text-sm text-white placeholder-white/25 focus:outline-none focus:border-pink-hot/40 resize-none transition-colors"></textarea>
+          </div>
+
+          <!-- Engagement Prompts -->
+          <div>
+            <label class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3 block">Engagement Prompt</label>
+            <div id="promptChips" class="flex flex-wrap gap-2">
+              <div class="prompt-chip px-3 py-1.5 rounded-full border border-white/10 text-xs font-medium text-white/60" data-prompt="What y'all think about this?">What y'all think about this?</div>
+              <div class="prompt-chip px-3 py-1.5 rounded-full border border-white/10 text-xs font-medium text-white/60" data-prompt="Be fr... is this valid?">Be fr... is this valid?</div>
+              <div class="prompt-chip px-3 py-1.5 rounded-full border border-white/10 text-xs font-medium text-white/60" data-prompt="Clock this and tell me I'm wrong">Clock this and tell me I'm wrong</div>
+              <div class="prompt-chip px-3 py-1.5 rounded-full border border-white/10 text-xs font-medium text-white/60" data-prompt="Hot take or cold take?">Hot take or cold take?</div>
+              <div class="prompt-chip px-3 py-1.5 rounded-full border border-white/10 text-xs font-medium text-white/60" data-prompt="Rate this 1-10">Rate this 1-10</div>
+              <div class="prompt-chip px-3 py-1.5 rounded-full border border-white/10 text-xs font-medium text-white/60" data-prompt="W or L?">W or L?</div>
+            </div>
+          </div>
+
+          <!-- Reaction Options -->
+          <div>
+            <label class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3 block">Reaction Set</label>
+            <div id="reactionSets" class="flex gap-3">
+              <button class="reaction-set btn-ghost px-4 py-2 rounded-xl text-sm selected" data-set="standard">
+                <span class="text-lg">🔥 💀 😭 🗣️ 💯</span>
+              </button>
+              <button class="reaction-set btn-ghost px-4 py-2 rounded-xl text-sm" data-set="vote">
+                <span class="text-lg">👍 👎 🤔 😤 🤷</span>
+              </button>
+              <button class="reaction-set btn-ghost px-4 py-2 rounded-xl text-sm" data-set="rate">
+                <span class="text-lg">⭐ ❌ ✅ 🏆 💩</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-3 pt-2">
+            <button id="addToQueueBtn" class="btn-pink flex-1 py-3 rounded-xl text-sm font-bold">
+              Add to Queue
+            </button>
+            <button id="broadcastNowBtn" class="btn-ghost flex-1 py-3 rounded-xl text-sm font-semibold text-pink-hot border-pink-hot/30">
+              Broadcast Now
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- RIGHT COLUMN: BROADCAST QUEUE -->
+  <div class="w-full lg:w-[380px] flex flex-col gap-4">
+
+    <!-- Queue Header -->
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <h3 class="text-sm font-bold">Broadcast Queue</h3>
+        <span id="queueCount" class="counter text-[10px] font-bold text-pink-hot bg-pink-hot/10 px-2 py-0.5 rounded-full">0</span>
+      </div>
+      <div class="flex gap-1">
+        <button class="tab-btn active px-3 py-2 text-xs font-semibold text-white/50" data-tab="queue">Queue</button>
+        <button class="tab-btn px-3 py-2 text-xs font-semibold text-white/50" data-tab="sent">Sent</button>
+      </div>
+    </div>
+
+    <!-- Queue List -->
+    <div id="queueList" class="flex flex-col gap-3 pb-20">
+      <!-- Empty State -->
+      <div id="emptyQueue" class="glass rounded-2xl p-8 text-center">
+        <div class="text-3xl mb-3 opacity-30">📡</div>
+        <p class="text-sm font-semibold text-white/40 mb-1">Queue Empty</p>
+        <p class="text-xs text-white/20">Drop content to start loading your broadcast</p>
+      </div>
+    </div>
+
+    <!-- Sent List -->
+    <div id="sentList" class="hidden flex flex-col gap-3 pb-20">
+      <div id="emptySent" class="glass rounded-2xl p-8 text-center">
+        <div class="text-3xl mb-3 opacity-30">✅</div>
+        <p class="text-sm font-semibold text-white/40 mb-1">Nothing Sent Yet</p>
+        <p class="text-xs text-white/20">Broadcasted content will appear here</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- BROADCAST PREVIEW MODAL -->
+<div id="broadcastModal" class="fixed inset-0 z-[100] hidden">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="modalOverlay"></div>
+  <div class="relative z-10 flex items-center justify-center min-h-screen p-4">
+    <div class="glass-pink rounded-3xl w-full max-w-lg overflow-hidden animate-in">
+      <div class="p-5 border-b border-pink-hot/10 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="status-dot status-live"></div>
+          <span class="text-sm font-bold text-pink-hot">BROADCASTING</span>
+        </div>
+        <button id="closeModal" class="text-white/40 hover:text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div id="modalContent" class="p-5 space-y-4">
+      </div>
+      <div class="px-5 pb-5">
+        <div class="flex gap-3">
+          <button id="copyBroadcast" class="btn-pink flex-1 py-3 rounded-xl text-sm font-bold">
+            Copy to Clipboard
+          </button>
+          <button id="downloadBroadcast" class="btn-ghost flex-1 py-3 rounded-xl text-sm font-semibold text-white/60">
+            Download
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast">
+  <div class="glass-pink px-5 py-3 rounded-xl flex items-center gap-3 shadow-2xl">
+    <span id="toastIcon" class="text-lg"></span>
+    <span id="toastMsg" class="text-sm font-semibold"></span>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ============== STATE ==============
+  const state = {
+    queue: [],
+    sent: [],
+    currentPreview: null,
+    selectedPrompt: '',
+    selectedReactionSet: 'standard',
+    activeTab: 'queue',
+    idCounter: 0
+  };
+
+  const reactionSets = {
+    standard: ['🔥', '💀', '😭', '🗣️', '💯'],
+    vote: ['👍', '👎', '🤔', '😤', '🤷'],
+    rate: ['⭐', '❌', '✅', '🏆', '💩']
+  };
+
+  // ============== DOM REFS ==============
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+
+  const dropZone = $('#dropZone');
+  const fileInput = $('#fileInput');
+  const pasteBtn = $('#pasteBtn');
+  const urlInputWrap = $('#urlInputWrap');
+  const urlInput = $('#urlInput');
+  const urlSubmitBtn = $('#urlSubmitBtn');
+  const urlCancelBtn = $('#urlCancelBtn');
+  const previewPanel = $('#previewPanel');
+  const previewMedia = $('#previewMedia');
+  const captionInput = $('#captionInput');
+  const closePreview = $('#closePreview');
+  const addToQueueBtn = $('#addToQueueBtn');
+  const broadcastNowBtn = $('#broadcastNowBtn');
+  const queueList = $('#queueList');
+  const sentList = $('#sentList');
+  const queueCount = $('#queueCount');
+  const emptyQueue = $('#emptyQueue');
+  const emptySent = $('#emptySent');
+  const clearAllBtn = $('#clearAllBtn');
+  const liveIndicator = $('#liveIndicator');
+  const broadcastModal = $('#broadcastModal');
+  const modalOverlay = $('#modalOverlay');
+  const closeModal = $('#closeModal');
+  const modalContent = $('#modalContent');
+  const copyBroadcast = $('#copyBroadcast');
+  const downloadBroadcast = $('#downloadBroadcast');
+
+  // ============== UTILITIES ==============
+  function genId() { return ++state.idCounter; }
+
+  function showToast(icon, msg) {
+    const toast = $('#toast');
+    $('#toastIcon').textContent = icon;
+    $('#toastMsg').textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function formatTime() {
+    const now = new Date();
+    return now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  }
+
+  function truncate(str, len) {
+    return str.length > len ? str.slice(0, len) + '...' : str;
+  }
+
+  // ============== DRAG & DROP ==============
+  ['dragenter', 'dragover'].forEach(evt => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.add('drag-over');
+    });
+  });
+
+  ['dragleave', 'drop'].forEach(evt => {
+    dropZone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.remove('drag-over');
+    });
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFiles(files);
+    } else {
+      const text = e.dataTransfer.getData('text/plain');
+      const html = e.dataTransfer.getData('text/html');
+      if (html) {
+        const imgMatch = html.match(/<img[^>]+src="([^"]+)"/);
+        const videoMatch = html.match(/<video[^>]+src="([^"]+)"/);
+        if (imgMatch) {
+          handleUrl(imgMatch[1], 'image');
+        } else if (videoMatch) {
+          handleUrl(videoMatch[1], 'video');
+        } else if (text && (text.startsWith('http') || text.startsWith('//'))) {
+          handleUrl(text, guessType(text));
+        } else {
+          showToast('⚠️', 'Could not detect media from that drop');
+        }
+      } else if (text && text.startsWith('http')) {
+        handleUrl(text, guessType(text));
+      }
+    }
+  });
+
+  function guessType(url) {
+    const lower = url.toLowerCase();
+    if (lower.match(/\.(mp4|webm|mov|m3u8)/)) return 'video';
+    if (lower.match(/\.(jpg|jpeg|png|gif|webp)/)) return 'image';
+    if (lower.includes('video') || lower.includes('twimg.com/ext_tw_video')) return 'video';
+    return 'image';
+  }
+
+  // ============== FILE HANDLING ==============
+  fileInput.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) handleFiles(e.target.files);
+  });
+
+  function handleFiles(fileList) {
+    const files = Array.from(fileList).filter(f => f.type.startsWith('video/') || f.type.startsWith('image/'));
+    if (files.length === 0) {
+      showToast('⚠️', 'No valid media files found');
+      return;
+    }
+
+    if (files.length === 1) {
+      openPreview(files[0]);
+    } else {
+      files.forEach((file, i) => {
+        setTimeout(() => openPreview(file, i > 0), i * 100);
+      });
+    }
+  }
+
+  function handleUrl(url, type) {
+    const item = {
+      type: type,
+      url: url,
+      name: url.split('/').pop().split('?')[0] || 'Linked Content',
+      source: 'url'
+    };
+    state.currentPreview = item;
+    showPreview(item);
+  }
+
+  function openPreview(file, autoQueue) {
+    const url = URL.createObjectURL(file);
+    const type = file.type.startsWith('video/') ? 'video' : 'image';
+    const item = {
+      type: type,
+      url: url,
+      name: file.name,
+      file: file,
+      source: 'file'
+    };
+
+    if (autoQueue) {
+      addItemToQueue(item, '', '', 'standard');
+      showToast('📥', `${truncate(file.name, 25)} added to queue`);
+      return;
+    }
+
+    state.currentPreview = item;
+    showPreview(item);
+  }
+
+  function showPreview(item) {
+    previewPanel.classList.remove('hidden');
+    previewPanel.classList.add('animate-in');
+    previewMedia.innerHTML = '';
+
+    if (item.type === 'video') {
+      const video = document.createElement('video');
+      video.src = item.url;
+      video.controls = true;
+      video.autoplay = false;
+      video.muted = true;
+      video.playsInline = true;
+      video.className = 'w-full';
+      video.style.maxHeight = '400px';
+      previewMedia.appendChild(video);
+    } else {
+      const img = document.createElement('img');
+      img.src = item.url;
+      img.alt = item.name;
+      img.className = 'preview w-full';
+      img.onerror = () => {
+        img.remove();
+        previewMedia.innerHTML = '<div class="p-8 text-center text-white/30 text-sm">Could not load image preview</div>';
+      };
+      previewMedia.appendChild(img);
+    }
+
+    captionInput.value = '';
+    state.selectedPrompt = '';
+    $$('.prompt-chip').forEach(c => c.classList.remove('selected'));
+
+    previewPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  // ============== PREVIEW CONTROLS ==============
+  closePreview.addEventListener('click', () => {
+    previewPanel.classList.add('hidden');
+    previewMedia.innerHTML = '';
+    state.currentPreview = null;
+  });
+
+  // Prompt Chips
+  $$('.prompt-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const wasSelected = chip.classList.contains('selected');
+      $$('.prompt-chip').forEach(c => c.classList.remove('selected'));
+      if (!wasSelected) {
+        chip.classList.add('selected');
+        state.selectedPrompt = chip.dataset.prompt;
+        captionInput.value = chip.dataset.prompt;
+      } else {
+        state.selectedPrompt = '';
+        captionInput.value = '';
+      }
+    });
+  });
+
+  // Reaction Sets
+  $$('.reaction-set').forEach(btn => {
+    btn.addEventListener('click', () => {
+      $$('.reaction-set').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.selectedReactionSet = btn.dataset.set;
+    });
+  });
+
+  // ============== QUEUE MANAGEMENT ==============
+  addToQueueBtn.addEventListener('click', () => {
+    if (!state.currentPreview) return;
+    const caption = captionInput.value.trim();
+    const prompt = state.selectedPrompt;
+    addItemToQueue(state.currentPreview, caption, prompt, state.selectedReactionSet);
+    showToast('📥', 'Added to broadcast queue');
+    previewPanel.classList.add('hidden');
+    previewMedia.innerHTML = '';
+    state.currentPreview = null;
+  });
+
+  broadcastNowBtn.addEventListener('click', () => {
+    if (!state.currentPreview) return;
+    const caption = captionInput.value.trim();
+    const prompt = state.selectedPrompt;
+    const item = createQueueItem(state.currentPreview, caption, prompt, state.selectedReactionSet);
+    item.status = 'live';
+    doBroadcast(item);
+    previewPanel.classList.add('hidden');
+    previewMedia.innerHTML = '';
+    state.currentPreview = null;
+  });
+
+  function createQueueItem(media, caption, prompt, reactionSet) {
+    return {
+      id: genId(),
+      media: media,
+      caption: caption || prompt || 'What y\'all think about this?',
+      prompt: prompt,
+      reactionSet: reactionSet,
+      reactions: reactionSets[reactionSet],
+      status: 'queued',
+      addedAt: formatTime(),
+      sentAt: null
+    };
+  }
+
+  function addItemToQueue(media, caption, prompt, reactionSet) {
+    const item = createQueueItem(media, caption, prompt, reactionSet);
+    state.queue.push(item);
+    renderQueue();
+    updateCount();
+  }
+
+  function removeFromQueue(id) {
+    state.queue = state.queue.filter(i => i.id !== id);
+    renderQueue();
+    updateCount();
+  }
+
+  function moveToSent(item) {
+    item.status = 'sent';
+    item.sentAt = formatTime();
+    state.sent.unshift(item);
+    state.queue = state.queue.filter(i => i.id !== item.id);
+    renderQueue();
+    renderSent();
+    updateCount();
+  }
+
+  function updateCount() {
+    queueCount.textContent = state.queue.length;
+    const hasLive = state.queue.some(i => i.status === 'live');
+    liveIndicator.classList.toggle('hidden', !hasLive);
+    liveIndicator.classList.toggle('flex', hasLive);
+  }
+
+  // ============== RENDER QUEUE ==============
+  function renderQueue() {
+    const cards = queueList.querySelectorAll('.queue-card');
+    cards.forEach(c => c.remove());
+
+    emptyQueue.classList.toggle('hidden', state.queue.length > 0);
+
+    state.queue.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = `queue-card glass rounded-xl p-3 flex gap-3 animate-in ${item.status === 'live' ? 'live' : ''}`;
+      card.dataset.id = item.id;
+      card.style.animationDelay = `${idx * 50}ms`;
+
+      const thumbUrl = item.media.url;
+      const isVideo = item.media.type === 'video';
+
+      card.innerHTML = `
+        <div class="media-thumb w-16 h-16 rounded-lg bg-dark-700 flex-shrink-0 overflow-hidden relative">
+          ${isVideo
+            ? `<video src="${thumbUrl}" class="w-full h-full object-cover" muted></video>
+               <div class="absolute inset-0 flex items-center justify-center z-10">
+                 <div class="w-6 h-6 rounded-full bg-black/60 flex items-center justify-center">
+                   <svg class="w-3 h-3 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                 </div>
+               </div>`
+            : `<img src="${thumbUrl}" class="w-full h-full object-cover" alt="">`
+          }
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-start justify-between gap-2 mb-1">
+            <p class="text-xs font-semibold text-white/80 leading-snug line-clamp-2">${item.caption}</p>
+            <div class="flex items-center gap-1 flex-shrink-0">
+              <div class="status-dot ${item.status === 'live' ? 'status-live' : item.status === 'queued' ? 'status-queued' : 'status-draft'}"></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 mb-2">
+            ${item.reactions.map(r => `<span class="text-xs">${r}</span>`).join('')}
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="broadcast-btn text-[10px] font-bold text-pink-hot hover:text-pink-glow transition-colors uppercase tracking-wider" data-id="${item.id}">
+              ${item.status === 'live' ? 'View' : 'Broadcast'}
+            </button>
+            <span class="text-white/10">|</span>
+            <button class="remove-btn text-[10px] font-medium text-white/25 hover:text-red-400 transition-colors uppercase tracking-wider" data-id="${item.id}">Remove</button>
+            ${idx > 0 ? `<span class="text-white/10">|</span><button class="moveup-btn text-[10px] font-medium text-white/25 hover:text-white/60 transition-colors uppercase tracking-wider" data-id="${item.id}">↑ Up</button>` : ''}
+          </div>
+        </div>
+      `;
+
+      queueList.appendChild(card);
+    });
+
+    bindQueueActions();
+  }
+
+  function renderSent() {
+    const cards = sentList.querySelectorAll('.queue-card');
+    cards.forEach(c => c.remove());
+
+    emptySent.classList.toggle('hidden', state.sent.length > 0);
+
+    state.sent.forEach((item, idx) => {
+      const card = document.createElement('div');
+      card.className = 'queue-card glass rounded-xl p-3 flex gap-3 animate-in opacity-70';
+      card.style.animationDelay = `${idx * 50}ms`;
+
+      const thumbUrl = item.media.url;
+      const isVideo = item.media.type === 'video';
+
+      card.innerHTML = `
+        <div class="media-thumb w-16 h-16 rounded-lg bg-dark-700 flex-shrink-0 overflow-hidden">
+          ${isVideo
+            ? `<video src="${thumbUrl}" class="w-full h-full object-cover" muted></video>`
+            : `<img src="${thumbUrl}" class="w-full h-full object-cover" alt="">`
+          }
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-semibold text-white/60 leading-snug line-clamp-2 mb-1">${item.caption}</p>
+          <div class="flex items-center gap-2 text-[10px] text-white/30">
+            <span>Sent ${item.sentAt}</span>
+            <span class="text-green-400/60">✓ Delivered</span>
+          </div>
+        </div>
+      `;
+
+      sentList.appendChild(card);
+    });
+  }
+
+  function bindQueueActions() {
+    queueList.querySelectorAll('.broadcast-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.dataset.id);
+        const item = state.queue.find(i => i.id === id);
+        if (item) doBroadcast(item);
+      });
+    });
+
+    queueList.querySelectorAll('.remove-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.dataset.id);
+        removeFromQueue(id);
+        showToast('🗑️', 'Removed from queue');
+      });
+    });
+
+    queueList.querySelectorAll('.moveup-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.dataset.id);
+        const idx = state.queue.findIndex(i => i.id === id);
+        if (idx > 0) {
+          [state.queue[idx - 1], state.queue[idx]] = [state.queue[idx], state.queue[idx - 1]];
+          renderQueue();
+        }
+      });
+    });
+  }
+
+  // ============== TABS ==============
+  $$('.tab-btn').forEach(tab => {
+    tab.addEventListener('click', () => {
+      $$('.tab-btn').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.activeTab = tab.dataset.tab;
+
+      queueList.classList.toggle('hidden', state.activeTab !== 'queue');
+      sentList.classList.toggle('hidden', state.activeTab !== 'sent');
+    });
+  });
+
+  // ============== BROADCAST ==============
+  function doBroadcast(item) {
+    broadcastModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+
+    const isVideo = item.media.type === 'video';
+    modalContent.innerHTML = `
+      <div class="rounded-xl overflow-hidden bg-black">
+        ${isVideo
+          ? `<video src="${item.media.url}" controls autoplay muted playsinline class="w-full" style="max-height:300px"></video>`
+          : `<img src="${item.media.url}" class="w-full" style="max-height:300px; object-fit:contain" alt="">`
+        }
+      </div>
+      <div class="glass rounded-xl p-4">
+        <p class="text-sm font-semibold mb-3">${item.caption}</p>
+        <div class="flex items-center gap-2 mb-3">
+          ${item.reactions.map(r => `
+            <button class="reaction-btn w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center text-lg hover:bg-pink-hot/10" data-reaction="${r}">
+              ${r}
+            </button>
+          `).join('')}
+        </div>
+        <div class="engagement-bar h-1 rounded-full w-0 transition-all duration-1000" id="engagementBar"></div>
+      </div>
+      <div class="flex items-center justify-between text-xs text-white/30">
+        <span class="counter">BBO Broadcast Channel</span>
+        <span class="counter">${formatTime()}</span>
+      </div>
+    `;
+
+    setTimeout(() => {
+      const bar = document.getElementById('engagementBar');
+      if (bar) bar.style.width = '100%';
+    }, 300);
+
+    modalContent.querySelectorAll('.reaction-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        btn.classList.toggle('selected');
+        const count = document.createElement('span');
+        count.className = 'counter text-[10px] text-white/50 ml-0.5';
+        count.textContent = Math.floor(Math.random() * 50 + 10);
+        if (btn.classList.contains('selected') && !btn.querySelector('.counter')) {
+          btn.appendChild(count);
+        } else if (!btn.classList.contains('selected')) {
+          const existing = btn.querySelector('.counter');
+          if (existing) existing.remove();
+        }
+      });
+    });
+
+    state.currentBroadcast = item;
+
+    if (!state.sent.find(s => s.id === item.id)) {
+      moveToSent(item);
+      showToast('📡', 'Content broadcasted!');
+    }
+  }
+
+  function closeBroadcastModal() {
+    broadcastModal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  closeModal.addEventListener('click', closeBroadcastModal);
+  modalOverlay.addEventListener('click', closeBroadcastModal);
+
+  // ============== COPY / DOWNLOAD ==============
+  copyBroadcast.addEventListener('click', async () => {
+    const item = state.currentBroadcast;
+    if (!item) return;
+
+    const text = `${item.caption}\n\nReact: ${item.reactions.join(' ')}\n\n📡 BBO Broadcast Channel`;
+
+    if (item.media.source === 'file' && item.media.file) {
+      try {
+        const clipItems = [];
+        const textBlob = new Blob([text], { type: 'text/plain' });
+        const clipData = { 'text/plain': textBlob };
+
+        if (item.media.type === 'image') {
+          const response = await fetch(item.media.url);
+          const blob = await response.blob();
+          clipData[blob.type] = blob;
+        }
+
+        await navigator.clipboard.write([new ClipboardItem(clipData)]);
+        showToast('✅', 'Copied to clipboard!');
+      } catch (e) {
+        await navigator.clipboard.writeText(text);
+        showToast('✅', 'Caption copied!');
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('✅', 'Caption copied!');
+      } catch (e) {
+        showToast('⚠️', 'Could not copy');
+      }
+    }
+  });
+
+  downloadBroadcast.addEventListener('click', () => {
+    const item = state.currentBroadcast;
+    if (!item || !item.media.url) return;
+
+    const a = document.createElement('a');
+    a.href = item.media.url;
+    a.download = `bbo-broadcast-${item.id}.${item.media.type === 'video' ? 'mp4' : 'png'}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('💾', 'Download started');
+  });
+
+  // ============== URL INPUT ==============
+  pasteBtn.addEventListener('click', () => {
+    urlInputWrap.classList.toggle('hidden');
+    if (!urlInputWrap.classList.contains('hidden')) {
+      urlInput.focus();
+    }
+  });
+
+  urlCancelBtn.addEventListener('click', () => {
+    urlInputWrap.classList.add('hidden');
+    urlInput.value = '';
+  });
+
+  urlSubmitBtn.addEventListener('click', () => {
+    const url = urlInput.value.trim();
+    if (!url) return;
+    handleUrl(url, guessType(url));
+    urlInputWrap.classList.add('hidden');
+    urlInput.value = '';
+  });
+
+  urlInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') urlSubmitBtn.click();
+  });
+
+  // ============== CLEAR ALL ==============
+  clearAllBtn.addEventListener('click', () => {
+    if (state.queue.length === 0 && state.sent.length === 0) return;
+    state.queue = [];
+    state.sent = [];
+    renderQueue();
+    renderSent();
+    updateCount();
+    previewPanel.classList.add('hidden');
+    previewMedia.innerHTML = '';
+    state.currentPreview = null;
+    showToast('🧹', 'Everything cleared');
+  });
+
+  // ============== PASTE FROM CLIPBOARD ==============
+  document.addEventListener('paste', async (e) => {
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        const file = items[i].getAsFile();
+        if (file) {
+          openPreview(file);
+          showToast('📋', 'Pasted from clipboard');
+          return;
+        }
+      }
+    }
+
+    const text = e.clipboardData.getData('text/plain');
+    if (text && text.startsWith('http')) {
+      handleUrl(text, guessType(text));
+      showToast('🔗', 'URL pasted');
+    }
+  });
+
+  // ============== KEYBOARD SHORTCUTS ==============
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (!broadcastModal.classList.contains('hidden')) {
+        closeBroadcastModal();
+      } else if (!previewPanel.classList.contains('hidden')) {
+        previewPanel.classList.add('hidden');
+        previewMedia.innerHTML = '';
+        state.currentPreview = null;
+      }
+    }
+  });
+
+  // ============== INIT ==============
+  updateCount();
+
+})();
+</script>
+</body>
+</html>
