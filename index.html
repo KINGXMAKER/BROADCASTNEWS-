@@ -643,7 +643,7 @@ aiHypeBtn.addEventListener('click', async () => {
   aiHypeBtn.style.opacity = '0.5';
 
   const apiKey = localStorage.getItem('bbo_gemini_key');
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
   let parts = [{ text: AI_SYSTEM_PROMPT }];
 
