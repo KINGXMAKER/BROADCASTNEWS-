@@ -2153,27 +2153,39 @@ RULES:
           const apiKey = localStorage.getItem('bbo_gemini_key');
           const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-          const prompt = `You are the content voice for BBO (Bad Bitches Only), an urban lifestyle brand.
+          const prompt = `You are BBO (Bad Bitches Only) — a viral urban culture brand. You're the PLUG for culture, tea, music, and lifestyle.
 
 Here is a tweet from ${handle}:
 "${tweetText}"
 
-Generate BBO-voiced content for 3 DIFFERENT PLATFORMS. Each must be formatted specifically for that platform.
+Generate BBO-voiced content for Twitter/X AND Threads AND Broadcast. Give me OPTIONS so I can pick the best one.
 
-Return your response in this EXACT format (use the markers precisely):
+Return your response in this EXACT format (use the markers EXACTLY as shown):
 
-===TWITTER===
-[Your Twitter/X post here. MUST be under 270 characters. Punchy, one-liner energy. No line breaks. 1-2 emojis max. Think viral quote tweet energy.]
-===THREADS===
-[Your Threads post here. Can be 2-4 short paragraphs. More conversational and storytelling. Can use line breaks between thoughts. 2-3 emojis. Add a question at the end to drive comments. Think "rant in the group chat" energy.]
+===TWEET 1===
+[Twitter/X post. MUST be under 270 characters total. One-liner. Quote tweet energy. 1-2 emojis max. No line breaks.]
+===TWEET 2===
+[Different angle. Under 270 characters. Maybe a question to drive engagement.]
+===TWEET 3===
+[Third option. Under 270 characters. Spiciest take.]
+===THREAD 1===
+[Threads post. 3-5 sentences across 2-3 short paragraphs. Conversational, storytelling vibe. Use line breaks between thoughts. 2-3 emojis. End with a question to drive comments. 300-500 characters.]
+===THREAD 2===
+[Different angle for Threads. Same format — conversational, engaging, complete thought. End with engagement hook. 300-500 characters.]
+===THREAD 3===
+[Third Threads option. Full paragraph energy. 300-500 characters.]
 ===BROADCAST===
-[Your Broadcast Channel post here. This is for WhatsApp/IG broadcast. Include a poll or vote prompt (A vs B, or W vs L). Use strategic CAPS. 1-3 emojis. 2-3 lines max. End with a clear call to action.]
+[Broadcast Channel post for WhatsApp/IG. Poll or vote (A vs B). Strategic CAPS. 1-3 emojis. 2-3 lines. Clear CTA.]
 
-RULES FOR ALL:
-- Tone: confident, urban, unapologetic, baddie energy, polarizing, entertaining
-- NO hashtags on any platform
-- NO generic filler — every word should HIT
-- BBO voice = the friend who always has the hottest take in the group chat
+VIBE CHECK — your content MUST:
+- Sound like the homie who always knows what's going on
+- Hype the culture, don't judge it. We're HERE for the entertainment
+- Be viral-ready — the type of post that gets screenshotted and shared
+- Speak directly to a young urban audience (18-35)
+- NO preaching, NO moral lectures, NO being corny
+- NO hashtags
+- Every word should make people want to engage, share, or comment
+- Think: Shade Room comments, group chat energy, your funniest friend's reaction
 ${direction ? `\nCREATIVE DIRECTION FROM HOST: ${direction}` : ''}`;
 
           try {
@@ -2182,7 +2194,7 @@ ${direction ? `\nCREATIVE DIRECTION FROM HOST: ${direction}` : ''}`;
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: 1.1, maxOutputTokens: 1200 }
+                generationConfig: { temperature: 1.2, maxOutputTokens: 2500 }
               })
             });
 
@@ -2195,23 +2207,45 @@ ${direction ? `\nCREATIVE DIRECTION FROM HOST: ${direction}` : ''}`;
             const data = await resp.json();
             const text = data.candidates[0].content.parts[0].text;
 
-            // Parse platform-specific sections
-            const result = { twitter: '', threads: '', broadcast: '' };
+            // Parse platform-specific sections (multiple per platform)
+            const result = { tweets: [], threads: [], broadcast: '' };
 
-            const twitterMatch = text.match(/===TWITTER===[\s]*([\s\S]*?)(?====THREADS===|$)/);
-            const threadsMatch = text.match(/===THREADS===[\s]*([\s\S]*?)(?====BROADCAST===|$)/);
+            // Parse TWEET 1, TWEET 2, TWEET 3
+            for (let i = 1; i <= 3; i++) {
+              const nextMarker = i < 3 ? `===TWEET ${i+1}===` : '===THREAD';
+              const regex = new RegExp(`===TWEET ${i}===[\\s]*([\\s\\S]*?)(?=${nextMarker}|$)`);
+              const match = text.match(regex);
+              if (match && match[1].trim()) result.tweets.push(match[1].trim());
+            }
+
+            // Parse THREAD 1, THREAD 2, THREAD 3
+            for (let i = 1; i <= 3; i++) {
+              const nextMarker = i < 3 ? `===THREAD ${i+1}===` : '===BROADCAST';
+              const regex = new RegExp(`===THREAD ${i}===[\\s]*([\\s\\S]*?)(?=${nextMarker}|$)`);
+              const match = text.match(regex);
+              if (match && match[1].trim()) result.threads.push(match[1].trim());
+            }
+
+            // Parse BROADCAST
             const broadcastMatch = text.match(/===BROADCAST===[\s]*([\s\S]*)$/);
-
-            if (twitterMatch) result.twitter = twitterMatch[1].trim();
-            if (threadsMatch) result.threads = threadsMatch[1].trim();
             if (broadcastMatch) result.broadcast = broadcastMatch[1].trim();
 
-            // Fallback: if parsing failed, split by ===POST=== like before
-            if (!result.twitter && !result.threads && !result.broadcast) {
-              const posts = text.split('===POST===').map(p => p.trim()).filter(p => p.length > 5);
-              result.twitter = posts[0] || '';
-              result.threads = posts[1] || posts[0] || '';
-              result.broadcast = posts[2] || posts[0] || '';
+            // Fallback: old format
+            if (result.tweets.length === 0 && result.threads.length === 0) {
+              const twitterMatch = text.match(/===TWITTER===[\s]*([\s\S]*?)(?====THREADS===|$)/);
+              const threadsMatch = text.match(/===THREADS===[\s]*([\s\S]*?)(?====BROADCAST===|$)/);
+              if (twitterMatch) result.tweets.push(twitterMatch[1].trim());
+              if (threadsMatch) result.threads.push(threadsMatch[1].trim());
+            }
+
+            // Last resort fallback
+            if (result.tweets.length === 0 && result.threads.length === 0) {
+              const posts = text.split(/===(?:POST|TWEET|THREAD)\s*\d*===/).map(p => p.trim()).filter(p => p.length > 5);
+              posts.forEach((p, i) => {
+                if (i < 3) result.tweets.push(p);
+                else if (i < 6) result.threads.push(p);
+                else result.broadcast = p;
+              });
             }
 
             return result;
@@ -2323,7 +2357,8 @@ ${direction ? `\nCREATIVE DIRECTION FROM HOST: ${direction}` : ''}`;
             const posts = await processTweetBBO(tweetText, authorDisplay);
             if (posts) {
               renderTweetBboResult(posts, authorDisplay, tweetText, url);
-              showToast('🔥', `${posts.length} BBO captions cooked!`);
+              const totalCooked = (posts.tweets?.length || 0) + (posts.threads?.length || 0) + (posts.broadcast ? 1 : 0);
+              showToast('🔥', `${totalCooked} BBO captions cooked!`);
             }
 
           } catch(err) {
@@ -2344,110 +2379,87 @@ ${direction ? `\nCREATIVE DIRECTION FROM HOST: ${direction}` : ''}`;
           tweetBboResult.innerHTML = '';
           tweetBboResult.classList.remove('hidden');
 
-          // Handle old format (array) for fallback compatibility
+          // Handle old format
           if (Array.isArray(result)) {
-            result = { twitter: result[0] || '', threads: result[1] || '', broadcast: result[2] || '' };
+            result = { tweets: result.slice(0, 3), threads: result.slice(3, 6), broadcast: result[6] || '' };
+          }
+          if (result.twitter && !result.tweets) {
+            result = { tweets: [result.twitter], threads: [result.threads], broadcast: result.broadcast };
           }
 
-          const platforms = [
-            {
-              key: 'twitter',
-              label: '𝕏 / Twitter',
-              icon: '𝕏',
-              cardClass: 'twitter-card',
-              badgeClass: 'twitter',
-              charLimit: 280,
-              copyLabel: 'Copy for 𝕏',
-              text: result.twitter
-            },
-            {
-              key: 'threads',
-              label: 'Threads',
-              icon: '🧵',
-              cardClass: 'threads-card',
-              badgeClass: 'threads',
-              charLimit: 500,
-              copyLabel: 'Copy for Threads',
-              text: result.threads
-            },
-            {
-              key: 'broadcast',
-              label: 'Broadcast Channel',
-              icon: '📡',
-              cardClass: 'broadcast-card',
-              badgeClass: 'broadcast',
-              charLimit: null,
-              copyLabel: 'Copy for Broadcast',
-              text: result.broadcast
-            }
-          ];
+          const tweets = result.tweets || [];
+          const threads = result.threads || [];
+          const broadcast = result.broadcast || '';
+          const totalItems = tweets.length + threads.length + (broadcast ? 1 : 0);
 
           // Header
           const header = document.createElement('div');
-          header.className = 'flex items-center justify-between mb-2 px-1';
+          header.className = 'flex items-center justify-between mb-3 px-1';
           header.innerHTML = `
             <div class="flex items-center gap-2">
               <span class="text-[10px] font-bold text-orange-400">⚡ ${handle}</span>
-              <span class="text-[8px] text-white/15 font-mono">→ 3 PLATFORMS READY</span>
+              <span class="text-[8px] text-white/15 font-mono">→ ${totalItems} OPTIONS READY</span>
             </div>
             <button class="copy-all-platforms text-[9px] font-bold text-white/25 hover:text-white/60 bg-white/3 hover:bg-white/6 px-3 py-1 rounded-lg transition uppercase tracking-wider">Copy All</button>
           `;
           tweetBboResult.appendChild(header);
 
-          // Copy All button
           header.querySelector('.copy-all-platforms').addEventListener('click', () => {
-            const allText = platforms.map(p => `--- ${p.label.toUpperCase()} ---\n${p.text}`).join('\n\n');
-            navigator.clipboard.writeText(allText).then(() => showToast('📋', 'All 3 platforms copied!'));
+            let allText = '';
+            if (tweets.length) allText += '--- 𝕏 / TWITTER ---\n' + tweets.map((t, i) => `(${i+1}) ${t}`).join('\n\n');
+            if (threads.length) allText += '\n\n--- THREADS ---\n' + threads.map((t, i) => `(${i+1}) ${t}`).join('\n\n');
+            if (broadcast) allText += '\n\n--- BROADCAST ---\n' + broadcast;
+            navigator.clipboard.writeText(allText).then(() => showToast('📋', `All ${totalItems} options copied!`));
           });
 
-          platforms.forEach((platform, i) => {
-            if (!platform.text) return;
-
+          // Helper to render a single card
+          function renderCard(text, platformConfig, idx, delay) {
             const card = document.createElement('div');
-            card.className = `platform-result-card ${platform.cardClass} rounded-xl p-4 anim-slide mb-2`;
-            card.style.animationDelay = `${i * 0.12}s`;
+            card.className = `platform-result-card ${platformConfig.cardClass} rounded-xl p-4 anim-slide mb-2`;
+            card.style.animationDelay = `${delay}s`;
 
-            const charCount = platform.text.length;
+            const charCount = text.length;
             let charClass = 'ok';
             let charDisplay = '';
-            if (platform.charLimit) {
-              if (charCount > platform.charLimit) charClass = 'over';
-              else if (charCount > platform.charLimit * 0.9) charClass = 'tight';
-              charDisplay = `<span class="char-count ${charClass}">${charCount}/${platform.charLimit}</span>`;
+            if (platformConfig.charLimit) {
+              if (charCount > platformConfig.charLimit) charClass = 'over';
+              else if (charCount > platformConfig.charLimit * 0.9) charClass = 'tight';
+              charDisplay = `<span class="char-count ${charClass}">${charCount}/${platformConfig.charLimit}</span>`;
             }
 
-            const safeText = platform.text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+            const safeText = text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
 
             card.innerHTML = `
               <div class="flex items-center justify-between mb-2.5">
-                <span class="platform-badge ${platform.badgeClass}">${platform.icon} ${platform.label}</span>
+                <div class="flex items-center gap-2">
+                  <span class="platform-badge ${platformConfig.badgeClass}">${platformConfig.icon} ${platformConfig.label}</span>
+                  ${idx !== null ? `<span class="text-[9px] font-bold text-white/20">option ${idx + 1}</span>` : ''}
+                </div>
                 ${charDisplay}
               </div>
               <div class="bg-black/30 rounded-lg p-3 mb-3 border border-white/3">
                 <p class="text-[13px] text-white/85 leading-relaxed font-medium">${safeText}</p>
               </div>
               <div class="flex gap-2 items-center">
-                <button class="platform-copy text-[9px] font-bold text-orange-400/60 hover:text-orange-400 bg-orange-400/5 hover:bg-orange-400/10 px-3 py-1.5 rounded-lg transition uppercase tracking-wider">${platform.copyLabel}</button>
+                <button class="platform-copy text-[9px] font-bold text-orange-400/60 hover:text-orange-400 bg-orange-400/5 hover:bg-orange-400/10 px-3 py-1.5 rounded-lg transition uppercase tracking-wider">${platformConfig.copyLabel}</button>
                 <button class="platform-heat text-[9px] font-bold text-pink-hot/40 hover:text-pink-hot bg-pink-hot/5 hover:bg-pink-hot/10 px-3 py-1.5 rounded-lg transition uppercase tracking-wider">+ Heat</button>
                 <a href="${sourceUrl}" target="_blank" class="text-[9px] font-bold text-white/10 hover:text-white/30 px-2 py-1.5 transition uppercase tracking-wider ml-auto">↗</a>
               </div>
             `;
 
-            // Copy for specific platform
             card.querySelector('.platform-copy').addEventListener('click', () => {
-              navigator.clipboard.writeText(platform.text).then(() =>
-                showToast('📋', `Copied for ${platform.label}!`)
+              navigator.clipboard.writeText(text).then(() =>
+                showToast('📋', `Copied for ${platformConfig.label}!`)
               );
             });
 
-            // Add to Heat
             card.querySelector('.platform-heat').addEventListener('click', () => {
               state.manualHeatItems.push({
-                id: `tweet-${platform.key}-` + (++state.heatManualIdCounter),
+                id: `tweet-${platformConfig.key}-` + (++state.heatManualIdCounter),
                 source: handle,
-                bboCaption: platform.text,
+                bboCaption: text,
                 originalTweet: originalText,
-                platform: platform.key,
+                platform: platformConfig.key,
                 heat: Math.floor(Math.random() * 15) + 82,
                 addedAt: formatTime()
               });
@@ -2458,7 +2470,7 @@ ${direction ? `\nCREATIVE DIRECTION FROM HOST: ${direction}` : ''}`;
                 <div class="flex items-center justify-between mb-2.5">
                   <div class="flex items-center gap-2">
                     <span class="text-[10px] font-bold text-orange-400/70">${handle}</span>
-                    <span class="platform-badge ${platform.badgeClass}" style="font-size:7px; padding:2px 5px;">${platform.icon} ${platform.label}</span>
+                    <span class="platform-badge ${platformConfig.badgeClass}" style="font-size:7px; padding:2px 5px;">${platformConfig.icon} ${platformConfig.label}</span>
                   </div>
                 </div>
                 <p class="text-[10px] text-white/25 mb-2 leading-relaxed italic">"${originalText.substring(0, 100).replace(/</g, '&lt;')}${originalText.length > 100 ? '...' : ''}"</p>
@@ -2471,15 +2483,46 @@ ${direction ? `\nCREATIVE DIRECTION FROM HOST: ${direction}` : ''}`;
               `;
 
               heatCard.querySelector('.manual-copy-btn').addEventListener('click', () => {
-                navigator.clipboard.writeText(platform.text).then(() => showToast('📋', 'Copied!'));
+                navigator.clipboard.writeText(text).then(() => showToast('📋', 'Copied!'));
               });
 
               heatDrops.appendChild(heatCard);
-              showToast('🔥', `Added ${platform.label} to Heat!`);
+              showToast('🔥', `Added ${platformConfig.label} to Heat!`);
             });
 
-            tweetBboResult.appendChild(card);
-          });
+            return card;
+          }
+
+          const twitterConfig = { key: 'twitter', label: '𝕏 / Twitter', icon: '𝕏', cardClass: 'twitter-card', badgeClass: 'twitter', charLimit: 280, copyLabel: 'Copy for 𝕏' };
+          const threadsConfig = { key: 'threads', label: 'Threads', icon: '🧵', cardClass: 'threads-card', badgeClass: 'threads', charLimit: 500, copyLabel: 'Copy for Threads' };
+          const broadcastConfig = { key: 'broadcast', label: 'Broadcast', icon: '📡', cardClass: 'broadcast-card', badgeClass: 'broadcast', charLimit: null, copyLabel: 'Copy for Broadcast' };
+
+          // Section: Tweets
+          if (tweets.length > 0) {
+            const section = document.createElement('div');
+            section.className = 'mb-3';
+            section.innerHTML = `<div class="text-[9px] font-bold text-[#1d9bf0] uppercase tracking-widest mb-1.5 px-1">𝕏 TWITTER — ${tweets.length} options</div>`;
+            tweets.forEach((t, i) => section.appendChild(renderCard(t, twitterConfig, i, i * 0.08)));
+            tweetBboResult.appendChild(section);
+          }
+
+          // Section: Threads
+          if (threads.length > 0) {
+            const section = document.createElement('div');
+            section.className = 'mb-3';
+            section.innerHTML = `<div class="text-[9px] font-bold text-white/40 uppercase tracking-widest mb-1.5 px-1">🧵 THREADS — ${threads.length} options</div>`;
+            threads.forEach((t, i) => section.appendChild(renderCard(t, threadsConfig, i, (tweets.length + i) * 0.08)));
+            tweetBboResult.appendChild(section);
+          }
+
+          // Section: Broadcast
+          if (broadcast) {
+            const section = document.createElement('div');
+            section.className = 'mb-1';
+            section.innerHTML = `<div class="text-[9px] font-bold text-pink-hot/60 uppercase tracking-widest mb-1.5 px-1">📡 BROADCAST</div>`;
+            section.appendChild(renderCard(broadcast, broadcastConfig, null, (tweets.length + threads.length) * 0.08));
+            tweetBboResult.appendChild(section);
+          }
         }
 
         /* ========== BROADCAST ========== */
