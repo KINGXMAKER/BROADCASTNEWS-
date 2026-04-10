@@ -1,0 +1,121 @@
+{
+  "meta": {
+    "generated": "2026-04-10T12:00:00-04:00",
+    "version": "1.0",
+    "engine": "BBO Ghost Engine v1"
+  },
+  "drops": {
+    "noon": {
+      "timestamp": "2026-04-10T12:00:00-04:00",
+      "label": "NOON DROP",
+      "accountsScraped": 21,
+      "items": [
+        {
+          "id": "noon-001",
+          "source": "@DailyLoud",
+          "sourceUrl": "https://x.com/DailyLoud",
+          "originalTweet": "Drake just dropped $2M on a custom car that nobody's ever seen before 🏎️",
+          "tweetUrl": "https://x.com/DailyLoud/status/1234567890",
+          "bboCaption": "Drake spending $2M on a whip that don't even have a NAME yet 💀 this is either the hardest flex of 2026 or the biggest L since that BBL era. BBO verdict: GUILTY of excessive drip 🔥⚖️",
+          "type": "hot-take",
+          "heat": 94,
+          "originalLikes": 45200,
+          "originalRetweets": 8900
+        },
+        {
+          "id": "noon-002",
+          "source": "@SaycheeseDGTL",
+          "sourceUrl": "https://x.com/SaycheeseDGTL",
+          "originalTweet": "Ice Spice seen at Nobu with a mystery man 👀",
+          "tweetUrl": "https://x.com/SaycheeseDGTL/status/1234567891",
+          "bboCaption": "Ice Spice at Nobu with a MYSTERY MAN? 👀 Y'all know BBO got the intel. Rate this on a scale of 'staged for PR' to 'she really out here living' — drop your verdict below ⬇️",
+          "type": "poll",
+          "heat": 87,
+          "originalLikes": 32100,
+          "originalRetweets": 5600
+        },
+        {
+          "id": "noon-003",
+          "source": "@nojumper",
+          "sourceUrl": "https://x.com/nojumper",
+          "originalTweet": "New underground artist from Detroit just went viral with 10M views in 24 hours 📈",
+          "tweetUrl": "https://x.com/nojumper/status/1234567892",
+          "bboCaption": "Detroit STAYS producing heat 🔥 10M views in 24 HOURS from an artist nobody knew about yesterday. Finish this sentence: 'Detroit rap is _____ right now' — wrong answers ONLY 🗣️",
+          "type": "finish-sentence",
+          "heat": 97,
+          "originalLikes": 67300,
+          "originalRetweets": 12400
+        },
+        {
+          "id": "noon-004",
+          "source": "@ComplexPop",
+          "sourceUrl": "https://x.com/ComplexPop",
+          "originalTweet": "Kanye's new merch line selling out in under 3 minutes flat",
+          "tweetUrl": "https://x.com/ComplexPop/status/1234567893",
+          "bboCaption": "3 MINUTES. That's all it took for Ye's merch to evaporate 💨 BBO Court is IN SESSION — is Kanye the greatest marketer alive or are y'all just addicted to the chaos? GUILTY or NOT GUILTY ⚖️",
+          "type": "bbo-court",
+          "heat": 99,
+          "originalLikes": 89400,
+          "originalRetweets": 18200
+        },
+        {
+          "id": "noon-005",
+          "source": "@WorldWideWob",
+          "sourceUrl": "https://x.com/WorldWideWob",
+          "originalTweet": "LeBron's son just had the dunk of the year in summer league 🏀",
+          "tweetUrl": "https://x.com/WorldWideWob/status/1234567894",
+          "bboCaption": "Bronny really said 'I AM my father's son' with that dunk 💀🏀 Poll time: A) He's earning his spot B) Nepotism still carrying — tap your answer, BBO don't do fence-sitting 🗣️",
+          "type": "poll",
+          "heat": 91,
+          "originalLikes": 54700,
+          "originalRetweets": 9800
+        }
+      ],
+      "trending": ["Drake", "Ice Spice", "Detroit rap", "Kanye", "Bronny"]
+    },
+    "evening": {
+      "timestamp": "2026-04-10T18:00:00-04:00",
+      "label": "6PM DROP",
+      "accountsScraped": 21,
+      "items": [
+        {
+          "id": "eve-001",
+          "source": "@HaterReport",
+          "sourceUrl": "https://x.com/HaterReport",
+          "originalTweet": "Cardi B just posted the most unhinged IG story of the year 😭",
+          "tweetUrl": "https://x.com/HaterReport/status/1234567895",
+          "bboCaption": "Cardi really said 'watch this' and gave us a WHOLE MOVIE on her story 😭💀 A) She's the most entertaining person alive B) Somebody needs to take her phone — BBO what's the verdict? 🗣️",
+          "type": "poll",
+          "heat": 96,
+          "originalLikes": 78200,
+          "originalRetweets": 15300
+        },
+        {
+          "id": "eve-002",
+          "source": "@Poetikflakko",
+          "sourceUrl": "https://x.com/Poetikflakko",
+          "originalTweet": "This new female rapper from Atlanta just bodied every verse on her mixtape 🎤🔥",
+          "tweetUrl": "https://x.com/Poetikflakko/status/1234567896",
+          "bboCaption": "Atlanta said 'we got next' and sent a PROBLEM 🔥🎤 Every verse on this tape hits different. BBO Hot Take: She's already TOP 5 new female rappers and most of y'all sleeping. Agree or Disagree? 💯",
+          "type": "hot-take",
+          "heat": 88,
+          "originalLikes": 23400,
+          "originalRetweets": 4100
+        },
+        {
+          "id": "eve-003",
+          "source": "@keep6ixsolid",
+          "sourceUrl": "https://x.com/keep6ixsolid",
+          "originalTweet": "Toronto artist just signed a $5M deal straight from SoundCloud 📝",
+          "tweetUrl": "https://x.com/keep6ixsolid/status/1234567897",
+          "bboCaption": "SoundCloud to $5M... the 6ix DON'T MISS 🇨🇦💰 BBO Court: GUILTY of inspiring every kid with a mic and a WiFi connection. This is what the internet was MADE for ⚖️🔥",
+          "type": "bbo-court",
+          "heat": 85,
+          "originalLikes": 19800,
+          "originalRetweets": 3200
+        }
+      ],
+      "trending": ["Cardi B", "Atlanta rap", "Toronto", "SoundCloud deals"]
+    }
+  }
+}

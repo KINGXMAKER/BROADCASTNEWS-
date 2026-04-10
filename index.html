@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>BBO BROADCAST DROP | Content Command Center</title>
+  <meta name="description" content="BBO Broadcast Drop - Your daily content command center for urban culture. Drop, curate, and broadcast content with AI-powered engagement.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#080808">
@@ -13,7 +14,7 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap"
     rel="stylesheet">
   <script>
-    tailwind.config = { theme: { extend: { colors: { pink: { hot: '#FF1493', glow: '#FF69B4', dim: '#990D58' }, dark: { 900: '#080808', 800: '#111111', 700: '#1a1a1a', 600: '#222222', 500: '#2a2a2a' } }, fontFamily: { inter: ['Inter', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] } } } }
+    tailwind.config = { theme: { extend: { colors: { pink: { hot: '#FF1493', glow: '#FF69B4', dim: '#990D58' }, dark: { 900: '#080808', 800: '#111111', 700: '#1a1a1a', 600: '#222222', 500: '#2a2a2a' }, heat: { low: '#FFD700', med: '#FF8C00', high: '#FF4500', max: '#FF1493' } }, fontFamily: { inter: ['Inter', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] } } } }
   </script>
   <style>
     * {
@@ -70,6 +71,12 @@
       background: rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.04)
+    }
+
+    .glass-heat {
+      background: linear-gradient(135deg, rgba(255, 69, 0, 0.08), rgba(255, 20, 147, 0.06));
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 69, 0, 0.15)
     }
 
     .drop-zone {
@@ -166,6 +173,28 @@
       }
     }
 
+    @keyframes heat-pulse {
+      0%, 100% { opacity: 0.6; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    @keyframes fire-flicker {
+      0%, 100% { text-shadow: 0 0 4px rgba(255,69,0,0.5); }
+      25% { text-shadow: 0 0 8px rgba(255,20,147,0.7); }
+      50% { text-shadow: 0 0 12px rgba(255,69,0,0.8); }
+      75% { text-shadow: 0 0 6px rgba(255,140,0,0.6); }
+    }
+
+    @keyframes heat-bar-fill {
+      from { width: 0; }
+      to { width: var(--heat-width); }
+    }
+
+    @keyframes notification-bounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
     .anim-slide {
       animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards
     }
@@ -246,6 +275,17 @@
       opacity: 1
     }
 
+    .btn-heat {
+      background: linear-gradient(135deg, #2a1a0a, #1a0a0a);
+      border: 1px solid rgba(255, 69, 0, 0.25);
+      transition: all 0.3s ease;
+    }
+
+    .btn-heat:hover {
+      border-color: rgba(255, 69, 0, 0.5);
+      box-shadow: 0 0 20px rgba(255, 69, 0, 0.15);
+    }
+
     .queue-card {
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
     }
@@ -258,6 +298,74 @@
     .queue-card.live {
       animation: glow-breathe 2s infinite;
       border-color: #FF1493
+    }
+
+    .heat-card {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .heat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255, 69, 0, 0.6), rgba(255, 20, 147, 0.4), transparent);
+    }
+
+    .heat-card:hover {
+      border-color: rgba(255, 69, 0, 0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(255, 69, 0, 0.1);
+    }
+
+    .heat-bar-bg {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 999px;
+      height: 4px;
+      overflow: hidden;
+    }
+
+    .heat-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      animation: heat-bar-fill 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .heat-score {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+    }
+
+    .heat-badge {
+      background: linear-gradient(135deg, rgba(255, 69, 0, 0.2), rgba(255, 20, 147, 0.15));
+      border: 1px solid rgba(255, 69, 0, 0.3);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      animation: fire-flicker 2s ease-in-out infinite;
+    }
+
+    .heat-notification {
+      animation: notification-bounce 0.6s ease;
+    }
+
+    .drop-time-badge {
+      background: linear-gradient(135deg, rgba(255, 140, 0, 0.15), rgba(255, 69, 0, 0.1));
+      border: 1px solid rgba(255, 140, 0, 0.25);
+    }
+
+    .trending-chip {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.2s ease;
+    }
+
+    .trending-chip:hover {
+      background: rgba(255, 69, 0, 0.08);
+      border-color: rgba(255, 69, 0, 0.25);
     }
 
     .prompt-chip {
@@ -327,6 +435,14 @@
 
     .tab-btn.active::after {
       transform: scaleX(1)
+    }
+
+    .tab-btn.active[data-tab="heat"] {
+      color: #FF4500;
+    }
+
+    .tab-btn.active[data-tab="heat"]::after {
+      background: linear-gradient(90deg, #FF4500, #FF1493);
     }
 
     .ai-card {
@@ -421,6 +537,12 @@
       background: rgba(255, 255, 255, 0.3)
     }
 
+    .status-heat {
+      background: #FF4500;
+      box-shadow: 0 0 8px #FF4500;
+      animation: pulse-glow 2s infinite;
+    }
+
     .media-thumb {
       transition: all 0.3s ease;
       position: relative;
@@ -440,6 +562,215 @@
       border: 1px solid rgba(255, 20, 147, 0.25);
       font-size: 9px;
       letter-spacing: 0.1em
+    }
+
+    /* Tweet processor */
+    .tweet-processor {
+      background: linear-gradient(135deg, rgba(29, 155, 240, 0.06), rgba(255, 69, 0, 0.04));
+      border: 1px solid rgba(29, 155, 240, 0.15);
+      transition: all 0.3s ease;
+    }
+
+    .tweet-processor:focus-within {
+      border-color: rgba(29, 155, 240, 0.4);
+      box-shadow: 0 0 25px rgba(29, 155, 240, 0.08);
+    }
+
+    .tweet-processor .tweet-input {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.2s ease;
+    }
+
+    .tweet-processor .tweet-input:focus {
+      border-color: rgba(29, 155, 240, 0.4);
+      outline: none;
+    }
+
+    .btn-tweet {
+      background: linear-gradient(135deg, #1d9bf0, #0d8bd9);
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-tweet:hover {
+      box-shadow: 0 4px 20px rgba(29, 155, 240, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-tweet:disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .tweet-preview-card {
+      background: rgba(29, 155, 240, 0.04);
+      border: 1px solid rgba(29, 155, 240, 0.12);
+      transition: all 0.3s ease;
+    }
+
+    .bbo-result-card {
+      background: linear-gradient(135deg, rgba(255, 69, 0, 0.06), rgba(255, 20, 147, 0.04));
+      border: 1px solid rgba(255, 69, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bbo-result-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #FF4500, #FF1493, #FF4500);
+    }
+
+    @keyframes tweet-loading {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    .tweet-loading-bar {
+      height: 3px;
+      background: linear-gradient(90deg, transparent, rgba(29, 155, 240, 0.6), rgba(255, 69, 0, 0.6), transparent);
+      background-size: 200% 100%;
+      animation: tweet-loading 1.5s linear infinite;
+      border-radius: 999px;
+    }
+
+    /* Platform badges */
+    .platform-badge {
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .platform-badge.twitter {
+      background: rgba(29, 155, 240, 0.12);
+      color: #1d9bf0;
+      border: 1px solid rgba(29, 155, 240, 0.2);
+    }
+
+    .platform-badge.threads {
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .platform-badge.broadcast {
+      background: rgba(255, 20, 147, 0.1);
+      color: #FF1493;
+      border: 1px solid rgba(255, 20, 147, 0.2);
+    }
+
+    .char-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+    }
+
+    .char-count.over { color: #ef4444; }
+    .char-count.ok { color: rgba(255, 255, 255, 0.2); }
+    .char-count.tight { color: #f59e0b; }
+
+    .platform-result-card {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .platform-result-card:hover {
+      transform: translateY(-1px);
+    }
+
+    .platform-result-card.twitter-card {
+      background: linear-gradient(135deg, rgba(29, 155, 240, 0.05), rgba(29, 155, 240, 0.02));
+      border: 1px solid rgba(29, 155, 240, 0.12);
+    }
+
+    .platform-result-card.twitter-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, #1d9bf0, transparent);
+    }
+
+    .platform-result-card.threads-card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .platform-result-card.threads-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    }
+
+    .platform-result-card.broadcast-card {
+      background: linear-gradient(135deg, rgba(255, 20, 147, 0.05), rgba(255, 69, 0, 0.03));
+      border: 1px solid rgba(255, 20, 147, 0.15);
+    }
+
+    .platform-result-card.broadcast-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, #FF4500, #FF1493);
+    }
+
+    /* Manual paste section */
+    .paste-section {
+      background: linear-gradient(135deg, rgba(255, 69, 0, 0.04), rgba(255, 20, 147, 0.03));
+      border: 1px dashed rgba(255, 69, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .paste-section:focus-within {
+      border-color: rgba(255, 69, 0, 0.5);
+      box-shadow: 0 0 20px rgba(255, 69, 0, 0.08);
+    }
+
+    /* Heat drop time selector */
+    .time-selector {
+      display: flex;
+      gap: 4px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 3px;
+    }
+
+    .time-btn {
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      color: rgba(255, 255, 255, 0.35);
+      border: none;
+      background: transparent;
+    }
+
+    .time-btn.active {
+      background: linear-gradient(135deg, rgba(255, 69, 0, 0.25), rgba(255, 20, 147, 0.2));
+      color: #FF4500;
+      box-shadow: 0 2px 10px rgba(255, 69, 0, 0.15);
+    }
+
+    .time-btn:hover:not(.active) {
+      color: rgba(255, 255, 255, 0.6);
+      background: rgba(255, 255, 255, 0.03);
     }
   </style>
 </head>
@@ -463,6 +794,10 @@
         <div id="liveIndicator" class="hidden items-center gap-2 px-3 py-1.5 rounded-full glass-pink">
           <div class="status-dot status-live"></div>
           <span class="text-[10px] font-bold text-pink-hot tracking-wider">LIVE</span>
+        </div>
+        <div id="heatIndicator" class="hidden items-center gap-2 px-3 py-1.5 rounded-full heat-badge">
+          <span class="text-[10px]">🔥</span>
+          <span class="text-[10px] font-bold text-orange-400 tracking-wider">HEAT READY</span>
         </div>
         <div id="aiStatusBadge" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full ai-badge">
           <span class="text-pink-hot">⚡</span>
@@ -634,12 +969,12 @@
       </section>
     </div>
 
-    <!-- ===== RIGHT COLUMN: QUEUE ===== -->
-    <div class="w-full lg:w-[370px] flex flex-col gap-4">
-      <!-- Queue Header -->
+    <!-- ===== RIGHT COLUMN: QUEUE + HEAT ===== -->
+    <div class="w-full lg:w-[400px] flex flex-col gap-4">
+      <!-- Queue/Sent/Heat Header -->
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <h3 class="text-xs font-black tracking-tight">Broadcast Queue</h3>
+          <h3 class="text-xs font-black tracking-tight">Command Center</h3>
           <span id="queueCount"
             class="counter text-[9px] font-bold text-pink-hot bg-pink-hot/10 px-2 py-0.5 rounded-full">0</span>
         </div>
@@ -648,6 +983,10 @@
             data-tab="queue">Queue</button>
           <button class="tab-btn px-3 py-2 text-[10px] font-bold text-white/40 uppercase tracking-wider"
             data-tab="sent">Sent</button>
+          <button class="tab-btn px-3 py-2 text-[10px] font-bold text-white/40 uppercase tracking-wider"
+            data-tab="heat" id="heatTabBtn">
+            <span class="flex items-center gap-1">🔥 Heat<span id="heatCount" class="hidden counter text-[8px] font-bold text-orange-400 bg-orange-400/10 px-1.5 py-0.5 rounded-full ml-0.5">0</span></span>
+          </button>
         </div>
       </div>
 
@@ -668,6 +1007,101 @@
           <div class="text-2xl mb-2 opacity-20">✅</div>
           <p class="text-xs font-bold text-white/30 mb-1">Nothing Sent Yet</p>
           <p class="text-[10px] text-white/15 font-medium">Broadcasts appear here</p>
+        </div>
+      </div>
+
+      <!-- ========== HEAT TAB ========== -->
+      <div id="heatList" class="hidden flex flex-col gap-3 pb-24 no-scroll overflow-y-auto"
+        style="max-height:calc(100vh - 140px)">
+
+        <!-- Heat Header -->
+        <div id="heatHeader" class="glass-heat rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-lg">🔥</span>
+              <div>
+                <h4 class="text-xs font-black tracking-tight text-orange-400">DAILY HEAT DROP</h4>
+                <p id="heatTimestamp" class="text-[9px] text-white/25 font-mono mt-0.5">Loading...</p>
+              </div>
+            </div>
+            <div class="time-selector" id="dropTimeSelector">
+              <button class="time-btn active" data-time="noon">☀️ Noon</button>
+              <button class="time-btn" data-time="evening">🌙 6PM</button>
+            </div>
+          </div>
+
+          <!-- Trending -->
+          <div id="trendingSection" class="hidden">
+            <label class="text-[8px] font-bold text-white/25 uppercase tracking-[0.2em] mb-1.5 block">Trending</label>
+            <div id="trendingChips" class="flex flex-wrap gap-1.5"></div>
+          </div>
+        </div>
+
+        <!-- ===== TWEET → BBO PROCESSOR ===== -->
+        <div class="tweet-processor rounded-2xl p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-sm">🐦</span>
+            <label class="text-[10px] font-bold text-white/40 uppercase tracking-[0.15em]">Tweet → BBO Voice</label>
+            <span class="text-[8px] text-blue-400/40 font-mono ml-auto">paste any tweet link</span>
+          </div>
+          <div class="flex gap-2 mb-2">
+            <input id="tweetUrlInput" type="url" placeholder="https://x.com/DailyLoud/status/123456..."
+              class="tweet-input flex-1 rounded-lg px-3 py-2.5 text-[12px] text-white placeholder-white/20 font-mono">
+            <button id="tweetProcessBtn" class="btn-tweet px-4 py-2.5 rounded-lg text-[10px] font-bold text-white uppercase tracking-wider whitespace-nowrap">
+              🔥 Cook It
+            </button>
+          </div>
+          <!-- Tweet loading -->
+          <div id="tweetLoading" class="hidden">
+            <div class="tweet-loading-bar mb-2"></div>
+            <p class="text-[10px] text-blue-400/60 font-medium text-center">Fetching tweet & cooking BBO voice...</p>
+          </div>
+          <!-- Tweet preview (shows fetched tweet) -->
+          <div id="tweetPreviewArea" class="hidden mt-2"></div>
+          <!-- BBO result -->
+          <div id="tweetBboResult" class="hidden mt-2"></div>
+        </div>
+
+        <!-- Heat Drops Container -->
+        <div id="heatDrops" class="flex flex-col gap-2.5"></div>
+
+        <!-- Manual Paste Section -->
+        <div class="paste-section rounded-2xl p-4">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-sm">✍️</span>
+            <label class="text-[10px] font-bold text-white/40 uppercase tracking-[0.15em]">Manual BBO Content</label>
+          </div>
+          <textarea id="manualHeatPaste" rows="3"
+            placeholder="Paste your own BBO-voiced content here... or paste scraped tweets for AI processing"
+            class="w-full bg-black/30 border border-white/6 rounded-xl px-4 py-3 text-[13px] text-white placeholder-white/15 focus:outline-none focus:border-orange-400/30 resize-none transition-colors font-medium mb-2.5"></textarea>
+          <div class="flex gap-2">
+            <button id="addManualHeat" class="btn-heat flex-1 py-2.5 rounded-xl text-[10px] font-bold text-orange-400 uppercase tracking-wider">
+              Add to Heat
+            </button>
+            <button id="copyManualHeat" class="btn-ghost px-4 py-2.5 rounded-xl text-[10px] font-bold text-white/30 uppercase tracking-wider">
+              Copy All
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty Heat State -->
+        <div id="emptyHeat" class="hidden glass rounded-2xl p-8 text-center">
+          <div class="text-3xl mb-3 opacity-30">🔥</div>
+          <p class="text-xs font-bold text-white/30 mb-1">No Heat Yet</p>
+          <p class="text-[10px] text-white/15 font-medium leading-relaxed max-w-[240px] mx-auto">
+            Set your <span class="text-orange-400/60">daily-drop.json URL</span> in Settings, or paste content manually below
+          </p>
+        </div>
+
+        <!-- Heat Feed Source Config -->
+        <div class="glass-dark rounded-xl p-3 mt-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[9px] font-bold text-white/20 uppercase tracking-wider">Feed Source</span>
+            <button id="refreshHeatBtn" class="text-[9px] font-bold text-orange-400/50 hover:text-orange-400 transition uppercase tracking-wider">
+              ↻ Refresh
+            </button>
+          </div>
+          <p id="feedSourceDisplay" class="text-[9px] text-white/15 font-mono mt-1 truncate">Not configured</p>
         </div>
       </div>
     </div>
@@ -708,7 +1142,7 @@
       <div class="glass rounded-2xl w-full max-w-md p-6 anim-slide" id="settingsBox">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-base font-black text-white flex items-center gap-2">
-            <span class="text-pink-hot">⚡</span> AI Engine Settings
+            <span class="text-pink-hot">⚡</span> Settings
           </h3>
           <button id="closeSettings" class="text-white/30 hover:text-white transition-colors">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -717,6 +1151,7 @@
           </button>
         </div>
         <div class="space-y-5">
+          <!-- AI Key -->
           <div>
             <label class="text-[10px] font-bold text-white/40 uppercase tracking-[0.15em] mb-2 block">Gemini API Key
               <span class="text-white/20">(optional)</span></label>
@@ -725,9 +1160,20 @@
               placeholder="Paste your Gemini key...">
             <p class="text-[10px] text-white/25 mt-2 font-medium">Free from <a href="https://aistudio.google.com/apikey"
                 target="_blank" class="text-pink-hot hover:text-pink-glow transition underline">Google AI Studio</a>.
-              Enables the AI Hype Engine to auto-generate captions. <strong class="text-white/40">App works without
-                it.</strong></p>
+              Enables the AI Hype Engine. <strong class="text-white/40">App works without it.</strong></p>
           </div>
+
+          <!-- Heat Feed URL -->
+          <div>
+            <label class="text-[10px] font-bold text-orange-400/60 uppercase tracking-[0.15em] mb-2 block">🔥 Heat Feed URL
+              <span class="text-white/20">(daily-drop.json)</span></label>
+            <input type="url" id="heatFeedUrlInput"
+              class="w-full bg-black border border-white/8 rounded-xl p-4 text-sm text-white focus:outline-none focus:border-orange-400/40 transition font-mono placeholder-white/15"
+              placeholder="https://raw.githubusercontent.com/YOUR-REPO/main/daily-drop.json">
+            <p class="text-[10px] text-white/25 mt-2 font-medium">URL to your <code class="text-orange-400/50">daily-drop.json</code> file.
+              Can be a GitHub raw URL, Google Apps Script endpoint, or any JSON API.</p>
+          </div>
+
           <div class="flex gap-3 pt-1">
             <button id="settingsCancelBtn"
               class="btn-ghost flex-1 py-3 rounded-xl text-xs font-bold text-white/40">Cancel</button>
@@ -768,7 +1214,12 @@
           idCounter: 0,
           aiGeneratedCaptions: [],
           mediaBase64: null,
-          mediaMimeType: null
+          mediaMimeType: null,
+          // HEAT state
+          heatData: null,
+          activeDropTime: 'noon',
+          manualHeatItems: [],
+          heatManualIdCounter: 0
         };
 
         const reactionSets = {
@@ -776,6 +1227,14 @@
           vote: ['👍', '👎', '🤔', '😤', '🤷'],
           rate: ['⭐', '❌', '✅', '🏆', '💩']
         };
+
+        const TWITTER_ACCOUNTS = [
+          '@Raindropsmedia1', '@onlydubsX', '@FearedBuck', '@HaterReport',
+          '@Poetikflakko', '@grindfacetv', '@HoodFamousTV_', '@baddietvv',
+          '@ayekeeno', '@Kurrco', '@BlockTopickz', '@keep6ixsolid',
+          '@SaycheeseDGTL', '@2Cool2Blog', '@itsavibe', '@shannonsharpeee',
+          '@DailyLoud', '@nojumper', '@ComplexPop', '@HTERK', '@WorldWideWob'
+        ];
 
         const AI_SYSTEM_PROMPT = `You are the content engine for BBO (Bad Bitches Only), an urban lifestyle brand. The host is dropping media into an Instagram/WhatsApp Broadcast Channel and needs engagement captions.
 
@@ -820,11 +1279,14 @@ RULES:
         const aiResults = $('#aiResults');
         const queueList = $('#queueList');
         const sentList = $('#sentList');
+        const heatList = $('#heatList');
         const queueCount = $('#queueCount');
         const emptyQueue = $('#emptyQueue');
         const emptySent = $('#emptySent');
+        const emptyHeat = $('#emptyHeat');
         const clearAllBtn = $('#clearAllBtn');
         const liveIndicator = $('#liveIndicator');
+        const heatIndicator = $('#heatIndicator');
         const aiStatusBadge = $('#aiStatusBadge');
         const broadcastModal = $('#broadcastModal');
         const modalOverlay = $('#modalOverlay');
@@ -837,9 +1299,26 @@ RULES:
         const settingsOverlay = $('#settingsOverlay');
         const closeSettings = $('#closeSettings');
         const apiKeyInput = $('#apiKeyInput');
+        const heatFeedUrlInput = $('#heatFeedUrlInput');
         const settingsSaveBtn = $('#settingsSaveBtn');
         const settingsCancelBtn = $('#settingsCancelBtn');
         const settingsRemoveKeyBtn = $('#settingsRemoveKeyBtn');
+        const heatTabBtn = $('#heatTabBtn');
+        const heatCount = $('#heatCount');
+        const heatTimestamp = $('#heatTimestamp');
+        const heatDrops = $('#heatDrops');
+        const trendingSection = $('#trendingSection');
+        const trendingChips = $('#trendingChips');
+        const feedSourceDisplay = $('#feedSourceDisplay');
+        const refreshHeatBtn = $('#refreshHeatBtn');
+        const manualHeatPaste = $('#manualHeatPaste');
+        const addManualHeat = $('#addManualHeat');
+        const copyManualHeat = $('#copyManualHeat');
+        const tweetUrlInput = $('#tweetUrlInput');
+        const tweetProcessBtn = $('#tweetProcessBtn');
+        const tweetLoading = $('#tweetLoading');
+        const tweetPreviewArea = $('#tweetPreviewArea');
+        const tweetBboResult = $('#tweetBboResult');
 
         /* ========== UTILITIES ========== */
         function genId() { return ++state.idCounter; }
@@ -864,10 +1343,25 @@ RULES:
           aiStatusBadge.classList.toggle('flex', hasApiKey());
         }
 
+        function getHeatColor(heat) {
+          if (heat >= 95) return '#FF1493';
+          if (heat >= 85) return '#FF4500';
+          if (heat >= 70) return '#FF8C00';
+          return '#FFD700';
+        }
+
+        function formatNumber(n) {
+          if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+          if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+          return n.toString();
+        }
+
         /* ========== SETTINGS ========== */
         function openSettingsModal() {
           const k = localStorage.getItem('bbo_gemini_key');
           if (k) apiKeyInput.value = k;
+          const feedUrl = localStorage.getItem('bbo_heat_feed_url');
+          if (feedUrl) heatFeedUrlInput.value = feedUrl;
           settingsRemoveKeyBtn.classList.toggle('hidden', !k);
           settingsModal.classList.remove('hidden');
         }
@@ -885,12 +1379,22 @@ RULES:
           const key = apiKeyInput.value.trim();
           if (key) {
             localStorage.setItem('bbo_gemini_key', key);
-            showToast('⚡', 'AI Engine activated!');
           } else {
             localStorage.removeItem('bbo_gemini_key');
-            showToast('✅', 'Settings saved');
           }
+
+          const feedUrl = heatFeedUrlInput.value.trim();
+          if (feedUrl) {
+            localStorage.setItem('bbo_heat_feed_url', feedUrl);
+            feedSourceDisplay.textContent = feedUrl;
+            loadHeatFeed();
+          } else {
+            localStorage.removeItem('bbo_heat_feed_url');
+            feedSourceDisplay.textContent = 'Not configured';
+          }
+
           updateAiBadge();
+          showToast('✅', 'Settings saved!');
           closeSettingsModal();
         });
 
@@ -973,7 +1477,6 @@ RULES:
 
           state.currentPreview = item;
 
-          // Read base64 for AI
           const reader = new FileReader();
           reader.onload = e => {
             const b64 = e.target.result.split(',')[1];
@@ -1061,9 +1564,7 @@ RULES:
 
           let parts = [{ text: AI_SYSTEM_PROMPT }];
 
-          // Add image/video if we have base64 (files only — URLs can't be inlined)
           if (state.mediaBase64 && state.mediaMimeType) {
-            // For large files, compress or skip
             const sizeKB = (state.mediaBase64.length * 3 / 4) / 1024;
             if (sizeKB < 4000) {
               parts.push({ inlineData: { mimeType: state.mediaMimeType, data: state.mediaBase64 } });
@@ -1081,7 +1582,6 @@ RULES:
             parts.push({ text: 'The user dropped a URL-based media file. Generate generic urban engagement content for a broadcast channel.' });
           }
 
-          // Add creative direction if provided
           const directionText = aiDirectionInput.value.trim();
           if (directionText) {
             parts.push({ text: `CREATIVE DIRECTION FROM THE HOST — FOLLOW THIS CLOSELY: ${directionText}` });
@@ -1341,8 +1841,646 @@ RULES:
             state.activeTab = tab.dataset.tab;
             queueList.classList.toggle('hidden', state.activeTab !== 'queue');
             sentList.classList.toggle('hidden', state.activeTab !== 'sent');
+            heatList.classList.toggle('hidden', state.activeTab !== 'heat');
           });
         });
+
+        /* ========== HEAT TAB ========== */
+
+        // Drop time selector
+        $$('#dropTimeSelector .time-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            $$('#dropTimeSelector .time-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.activeDropTime = btn.dataset.time;
+            renderHeatDrops();
+          });
+        });
+
+        // Load heat feed from configured URL
+        async function loadHeatFeed() {
+          const feedUrl = localStorage.getItem('bbo_heat_feed_url');
+          if (!feedUrl) {
+            feedSourceDisplay.textContent = 'Not configured';
+            // Try loading from same directory (relative path)
+            try {
+              const resp = await fetch('./daily-drop.json?t=' + Date.now());
+              if (resp.ok) {
+                const data = await resp.json();
+                state.heatData = data;
+                feedSourceDisplay.textContent = './daily-drop.json (local)';
+                renderHeatDrops();
+                updateHeatIndicator();
+                return;
+              }
+            } catch(e) {}
+            emptyHeat.classList.remove('hidden');
+            return;
+          }
+
+          feedSourceDisplay.textContent = feedUrl;
+          try {
+            const resp = await fetch(feedUrl + '?t=' + Date.now());
+            if (!resp.ok) throw new Error('Failed to fetch');
+            const data = await resp.json();
+            state.heatData = data;
+            renderHeatDrops();
+            updateHeatIndicator();
+            showToast('🔥', 'Heat feed loaded!');
+          } catch(err) {
+            console.error('Heat feed error:', err);
+            showToast('⚠️', 'Could not load heat feed');
+            emptyHeat.classList.remove('hidden');
+          }
+        }
+
+        function updateHeatIndicator() {
+          const hasData = state.heatData && state.heatData.drops;
+          heatIndicator.classList.toggle('hidden', !hasData);
+          heatIndicator.classList.toggle('flex', !!hasData);
+
+          if (hasData) {
+            const dropData = state.heatData.drops[state.activeDropTime];
+            const count = dropData ? dropData.items.length : 0;
+            heatCount.textContent = count;
+            heatCount.classList.toggle('hidden', count === 0);
+          }
+        }
+
+        function renderHeatDrops() {
+          heatDrops.innerHTML = '';
+
+          if (!state.heatData || !state.heatData.drops) {
+            emptyHeat.classList.remove('hidden');
+            return;
+          }
+
+          const dropData = state.heatData.drops[state.activeDropTime];
+          if (!dropData || !dropData.items || dropData.items.length === 0) {
+            emptyHeat.classList.remove('hidden');
+            heatDrops.innerHTML = `
+              <div class="glass rounded-2xl p-6 text-center">
+                <p class="text-xs font-bold text-white/30 mb-1">No ${state.activeDropTime === 'noon' ? 'Noon' : '6PM'} Drop Yet</p>
+                <p class="text-[10px] text-white/15">Check back at ${state.activeDropTime === 'noon' ? '12:00 PM' : '6:00 PM'}</p>
+              </div>`;
+            return;
+          }
+
+          emptyHeat.classList.add('hidden');
+
+          // Update timestamp
+          const ts = new Date(dropData.timestamp);
+          heatTimestamp.textContent = `${dropData.label} • ${ts.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} • ${dropData.accountsScraped} accounts scraped`;
+
+          // Trending chips
+          if (dropData.trending && dropData.trending.length > 0) {
+            trendingSection.classList.remove('hidden');
+            trendingChips.innerHTML = '';
+            dropData.trending.forEach(tag => {
+              const chip = document.createElement('span');
+              chip.className = 'trending-chip px-2.5 py-1 rounded-full text-[10px] font-bold text-white/40';
+              chip.textContent = tag;
+              trendingChips.appendChild(chip);
+            });
+          } else {
+            trendingSection.classList.add('hidden');
+          }
+
+          // Update heat count badge
+          heatCount.textContent = dropData.items.length;
+          heatCount.classList.remove('hidden');
+
+          // Render each drop card
+          dropData.items.forEach((item, idx) => {
+            const card = document.createElement('div');
+            card.className = 'heat-card glass-dark rounded-xl p-4 anim-slide';
+            card.style.animationDelay = `${idx * 0.06}s`;
+
+            const heatColor = getHeatColor(item.heat);
+            const typeEmoji = item.type === 'poll' ? '📊' : item.type === 'bbo-court' ? '⚖️' : item.type === 'finish-sentence' ? '✍️' : '🔥';
+
+            card.innerHTML = `
+              <div class="flex items-center justify-between mb-2.5">
+                <div class="flex items-center gap-2">
+                  <a href="${item.sourceUrl}" target="_blank" class="text-[10px] font-bold text-orange-400/70 hover:text-orange-400 transition">${item.source}</a>
+                  <span class="text-[9px] text-white/15 font-mono">${typeEmoji} ${item.type}</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="heat-score text-[11px]" style="color: ${heatColor}">${item.heat}</span>
+                  <span class="text-[8px] text-white/20 font-bold">HEAT</span>
+                </div>
+              </div>
+
+              <p class="text-[10px] text-white/25 mb-2 leading-relaxed italic">"${truncStr(item.originalTweet, 120)}"</p>
+
+              <div class="bg-black/30 rounded-lg p-3 mb-3 border border-white/3">
+                <p class="text-[13px] text-white/85 leading-relaxed font-medium">${item.bboCaption}</p>
+              </div>
+
+              <div class="heat-bar-bg mb-3">
+                <div class="heat-bar-fill" style="--heat-width: ${item.heat}%; background: linear-gradient(90deg, ${heatColor}80, ${heatColor}); width: ${item.heat}%;"></div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 text-[9px] text-white/20">
+                  <span>❤️ ${formatNumber(item.originalLikes)}</span>
+                  <span>🔄 ${formatNumber(item.originalRetweets)}</span>
+                </div>
+                <div class="flex gap-1.5">
+                  <button class="heat-copy-btn text-[9px] font-bold text-orange-400/60 hover:text-orange-400 bg-orange-400/5 hover:bg-orange-400/10 px-3 py-1.5 rounded-lg transition uppercase tracking-wider" data-caption="${encodeURIComponent(item.bboCaption)}">Copy</button>
+                  <a href="${item.tweetUrl}" target="_blank" class="text-[9px] font-bold text-white/20 hover:text-white/50 bg-white/3 hover:bg-white/6 px-3 py-1.5 rounded-lg transition uppercase tracking-wider inline-flex items-center">Source</a>
+                </div>
+              </div>
+            `;
+
+            // Copy button
+            card.querySelector('.heat-copy-btn').addEventListener('click', (e) => {
+              e.stopPropagation();
+              const caption = decodeURIComponent(e.target.dataset.caption);
+              navigator.clipboard.writeText(caption).then(() => showToast('📋', 'BBO caption copied!'));
+            });
+
+            heatDrops.appendChild(card);
+          });
+        }
+
+        // Manual heat content
+        addManualHeat.addEventListener('click', () => {
+          const text = manualHeatPaste.value.trim();
+          if (!text) { showToast('⚠️', 'Paste some content first'); return; }
+
+          state.manualHeatItems.push({
+            id: 'manual-' + (++state.heatManualIdCounter),
+            source: '@manual',
+            bboCaption: text,
+            heat: 80,
+            addedAt: formatTime()
+          });
+
+          // Add as a card to heatDrops
+          const card = document.createElement('div');
+          card.className = 'heat-card glass-dark rounded-xl p-4 anim-slide';
+
+          card.innerHTML = `
+            <div class="flex items-center justify-between mb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold text-pink-hot/70">✍️ Manual Entry</span>
+                <span class="text-[9px] text-white/15 font-mono">${formatTime()}</span>
+              </div>
+              <span class="text-[9px] text-white/20 font-bold uppercase">Custom</span>
+            </div>
+            <div class="bg-black/30 rounded-lg p-3 mb-3 border border-white/3">
+              <p class="text-[13px] text-white/85 leading-relaxed font-medium">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</p>
+            </div>
+            <div class="flex gap-1.5 justify-end">
+              <button class="manual-copy-btn text-[9px] font-bold text-pink-hot/60 hover:text-pink-hot bg-pink-hot/5 hover:bg-pink-hot/10 px-3 py-1.5 rounded-lg transition uppercase tracking-wider">Copy</button>
+            </div>
+          `;
+
+          card.querySelector('.manual-copy-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            navigator.clipboard.writeText(text).then(() => showToast('📋', 'Copied!'));
+          });
+
+          // Insert before paste section
+          heatDrops.appendChild(card);
+          manualHeatPaste.value = '';
+          showToast('🔥', 'Added to Heat!');
+        });
+
+        // Copy all heat content
+        copyManualHeat.addEventListener('click', () => {
+          const allContent = [];
+
+          // From feed
+          if (state.heatData && state.heatData.drops) {
+            const dropData = state.heatData.drops[state.activeDropTime];
+            if (dropData && dropData.items) {
+              dropData.items.forEach(item => {
+                allContent.push(`[${item.source}] ${item.bboCaption}`);
+              });
+            }
+          }
+
+          // From manual
+          state.manualHeatItems.forEach(item => {
+            allContent.push(item.bboCaption);
+          });
+
+          if (allContent.length === 0) {
+            showToast('⚠️', 'No content to copy');
+            return;
+          }
+
+          const fullText = allContent.join('\n\n---\n\n');
+          navigator.clipboard.writeText(fullText).then(() => showToast('📋', `Copied ${allContent.length} items!`));
+        });
+
+        refreshHeatBtn.addEventListener('click', () => {
+          loadHeatFeed();
+        });
+
+        /* ========== TWEET → BBO PROCESSOR ========== */
+
+        function extractTweetId(url) {
+          // Match tweet/status URLs from twitter.com, x.com, mobile, etc
+          const patterns = [
+            /(?:twitter\.com|x\.com)\/\w+\/status(?:es)?\/(\d+)/i,
+            /(?:twitter\.com|x\.com)\/i\/web\/status\/(\d+)/i,
+            /(?:t\.co|fxtwitter\.com|vxtwitter\.com|nitter\.[\w.]+)\/\w+\/status\/(\d+)/i
+          ];
+          for (const pat of patterns) {
+            const m = url.match(pat);
+            if (m) return m[1];
+          }
+          return null;
+        }
+
+        function extractHandle(url) {
+          const m = url.match(/(?:twitter\.com|x\.com)\/(@?\w+)\/status/i);
+          return m ? (m[1].startsWith('@') ? m[1] : '@' + m[1]) : '@unknown';
+        }
+
+        async function fetchTweetText(tweetId) {
+          // Try FxTwitter API first (best CORS support)
+          const apis = [
+            `https://api.fxtwitter.com/status/${tweetId}`,
+            `https://api.vxtwitter.com/Twitter/status/${tweetId}`
+          ];
+
+          for (const apiUrl of apis) {
+            try {
+              const resp = await fetch(apiUrl, { headers: { 'Accept': 'application/json' } });
+              if (resp.ok) {
+                const data = await resp.json();
+                // FxTwitter format
+                if (data.tweet) {
+                  return {
+                    text: data.tweet.text,
+                    author: data.tweet.author?.screen_name ? '@' + data.tweet.author.screen_name : null,
+                    authorName: data.tweet.author?.name || null,
+                    likes: data.tweet.likes || 0,
+                    retweets: data.tweet.retweets || 0,
+                    media: data.tweet.media?.all?.[0]?.url || null
+                  };
+                }
+                // VxTwitter format
+                if (data.text) {
+                  return {
+                    text: data.text,
+                    author: data.user_screen_name ? '@' + data.user_screen_name : null,
+                    authorName: data.user_name || null,
+                    likes: data.likes || 0,
+                    retweets: data.retweets || 0,
+                    media: data.media_extended?.[0]?.url || null
+                  };
+                }
+              }
+            } catch(e) {
+              console.warn('API failed:', apiUrl, e);
+            }
+          }
+          return null;
+        }
+
+        async function processTweetBBO(tweetText, handle, direction) {
+          if (!hasApiKey()) {
+            openSettingsModal();
+            showToast('⚡', 'Add your Gemini key first');
+            return null;
+          }
+
+          const apiKey = localStorage.getItem('bbo_gemini_key');
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+          const prompt = `You are the content voice for BBO (Bad Bitches Only), an urban lifestyle brand.
+
+Here is a tweet from ${handle}:
+"${tweetText}"
+
+Generate BBO-voiced content for 3 DIFFERENT PLATFORMS. Each must be formatted specifically for that platform.
+
+Return your response in this EXACT format (use the markers precisely):
+
+===TWITTER===
+[Your Twitter/X post here. MUST be under 270 characters. Punchy, one-liner energy. No line breaks. 1-2 emojis max. Think viral quote tweet energy.]
+===THREADS===
+[Your Threads post here. Can be 2-4 short paragraphs. More conversational and storytelling. Can use line breaks between thoughts. 2-3 emojis. Add a question at the end to drive comments. Think "rant in the group chat" energy.]
+===BROADCAST===
+[Your Broadcast Channel post here. This is for WhatsApp/IG broadcast. Include a poll or vote prompt (A vs B, or W vs L). Use strategic CAPS. 1-3 emojis. 2-3 lines max. End with a clear call to action.]
+
+RULES FOR ALL:
+- Tone: confident, urban, unapologetic, baddie energy, polarizing, entertaining
+- NO hashtags on any platform
+- NO generic filler — every word should HIT
+- BBO voice = the friend who always has the hottest take in the group chat
+${direction ? `\nCREATIVE DIRECTION FROM HOST: ${direction}` : ''}`;
+
+          try {
+            const resp = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 1.1, maxOutputTokens: 1200 }
+              })
+            });
+
+            if (!resp.ok) {
+              const errText = await resp.text();
+              if (errText.includes('API_KEY_INVALID')) throw new Error('Invalid API key');
+              throw new Error('API error');
+            }
+
+            const data = await resp.json();
+            const text = data.candidates[0].content.parts[0].text;
+
+            // Parse platform-specific sections
+            const result = { twitter: '', threads: '', broadcast: '' };
+
+            const twitterMatch = text.match(/===TWITTER===[\s]*([\s\S]*?)(?====THREADS===|$)/);
+            const threadsMatch = text.match(/===THREADS===[\s]*([\s\S]*?)(?====BROADCAST===|$)/);
+            const broadcastMatch = text.match(/===BROADCAST===[\s]*([\s\S]*)$/);
+
+            if (twitterMatch) result.twitter = twitterMatch[1].trim();
+            if (threadsMatch) result.threads = threadsMatch[1].trim();
+            if (broadcastMatch) result.broadcast = broadcastMatch[1].trim();
+
+            // Fallback: if parsing failed, split by ===POST=== like before
+            if (!result.twitter && !result.threads && !result.broadcast) {
+              const posts = text.split('===POST===').map(p => p.trim()).filter(p => p.length > 5);
+              result.twitter = posts[0] || '';
+              result.threads = posts[1] || posts[0] || '';
+              result.broadcast = posts[2] || posts[0] || '';
+            }
+
+            return result;
+          } catch(err) {
+            console.error('BBO AI error:', err);
+            throw err;
+          }
+        }
+
+        // Process tweet button handler
+        tweetProcessBtn.addEventListener('click', async () => {
+          const url = tweetUrlInput.value.trim();
+          if (!url) {
+            showToast('⚠️', 'Paste a tweet URL first');
+            tweetUrlInput.focus();
+            return;
+          }
+
+          const tweetId = extractTweetId(url);
+          if (!tweetId) {
+            showToast('❌', 'Not a valid tweet URL');
+            return;
+          }
+
+          if (!hasApiKey()) {
+            openSettingsModal();
+            showToast('⚡', 'Add your Gemini API key in Settings to cook tweets');
+            return;
+          }
+
+          const handle = extractHandle(url);
+
+          // Show loading
+          tweetLoading.classList.remove('hidden');
+          tweetPreviewArea.innerHTML = '';
+          tweetPreviewArea.classList.add('hidden');
+          tweetBboResult.innerHTML = '';
+          tweetBboResult.classList.add('hidden');
+          tweetProcessBtn.disabled = true;
+          tweetProcessBtn.textContent = '⏳ Cooking...';
+
+          try {
+            // Step 1: Fetch tweet
+            const tweetData = await fetchTweetText(tweetId);
+            let tweetText;
+            let authorDisplay;
+
+            if (tweetData) {
+              tweetText = tweetData.text;
+              authorDisplay = tweetData.author || handle;
+
+              // Show tweet preview
+              tweetPreviewArea.innerHTML = `
+                <div class="tweet-preview-card rounded-xl p-3">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="text-[10px]">🐦</span>
+                    <span class="text-[11px] font-bold text-blue-400/80">${authorDisplay}</span>
+                    ${tweetData.authorName ? `<span class="text-[9px] text-white/25">${tweetData.authorName}</span>` : ''}
+                    <span class="text-[8px] text-white/15 font-mono ml-auto">FETCHED ✓</span>
+                  </div>
+                  <p class="text-[12px] text-white/60 leading-relaxed">${tweetText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+                  <div class="flex gap-3 mt-2 text-[9px] text-white/20">
+                    <span>❤️ ${formatNumber(tweetData.likes)}</span>
+                    <span>🔄 ${formatNumber(tweetData.retweets)}</span>
+                  </div>
+                </div>
+              `;
+              tweetPreviewArea.classList.remove('hidden');
+            } else {
+              // API failed — user must paste tweet text manually
+              showToast('⚠️', 'Could not fetch tweet — paste the text below');
+              tweetPreviewArea.innerHTML = `
+                <div class="tweet-preview-card rounded-xl p-3">
+                  <p class="text-[10px] text-yellow-400/60 mb-2">⚠️ Couldn\'t fetch tweet automatically. Paste the tweet text:</p>
+                  <textarea id="manualTweetText" rows="3" placeholder="Paste the tweet text here..."
+                    class="w-full bg-black/30 border border-white/8 rounded-lg px-3 py-2 text-[12px] text-white placeholder-white/20 focus:outline-none focus:border-blue-400/30 resize-none font-medium"></textarea>
+                  <button id="manualTweetCookBtn" class="btn-tweet w-full mt-2 py-2 rounded-lg text-[10px] font-bold text-white uppercase">Cook This Text 🔥</button>
+                </div>
+              `;
+              tweetPreviewArea.classList.remove('hidden');
+              tweetLoading.classList.add('hidden');
+              tweetProcessBtn.disabled = false;
+              tweetProcessBtn.textContent = '🔥 Cook It';
+
+              // Bind manual cook button
+              const manualCookBtn = document.getElementById('manualTweetCookBtn');
+              if (manualCookBtn) {
+                manualCookBtn.addEventListener('click', async () => {
+                  const manualText = document.getElementById('manualTweetText').value.trim();
+                  if (!manualText) { showToast('⚠️', 'Paste tweet text first'); return; }
+                  manualCookBtn.disabled = true;
+                  manualCookBtn.textContent = '⏳ Cooking...';
+                  tweetLoading.classList.remove('hidden');
+                  try {
+                    const posts = await processTweetBBO(manualText, handle);
+                    if (posts) renderTweetBboResult(posts, handle, manualText, url);
+                  } catch(e) { showToast('❌', e.message || 'AI processing failed'); }
+                  finally {
+                    tweetLoading.classList.add('hidden');
+                    manualCookBtn.disabled = false;
+                    manualCookBtn.textContent = 'Cook This Text 🔥';
+                  }
+                });
+              }
+              return;
+            }
+
+            // Step 2: Send to Gemini BBO voice
+            const posts = await processTweetBBO(tweetText, authorDisplay);
+            if (posts) {
+              renderTweetBboResult(posts, authorDisplay, tweetText, url);
+              showToast('🔥', `${posts.length} BBO captions cooked!`);
+            }
+
+          } catch(err) {
+            showToast('❌', err.message || 'Processing failed');
+          } finally {
+            tweetLoading.classList.add('hidden');
+            tweetProcessBtn.disabled = false;
+            tweetProcessBtn.textContent = '🔥 Cook It';
+          }
+        });
+
+        // Enter key
+        tweetUrlInput.addEventListener('keydown', e => {
+          if (e.key === 'Enter') tweetProcessBtn.click();
+        });
+
+        function renderTweetBboResult(result, handle, originalText, sourceUrl) {
+          tweetBboResult.innerHTML = '';
+          tweetBboResult.classList.remove('hidden');
+
+          // Handle old format (array) for fallback compatibility
+          if (Array.isArray(result)) {
+            result = { twitter: result[0] || '', threads: result[1] || '', broadcast: result[2] || '' };
+          }
+
+          const platforms = [
+            {
+              key: 'twitter',
+              label: '𝕏 / Twitter',
+              icon: '𝕏',
+              cardClass: 'twitter-card',
+              badgeClass: 'twitter',
+              charLimit: 280,
+              copyLabel: 'Copy for 𝕏',
+              text: result.twitter
+            },
+            {
+              key: 'threads',
+              label: 'Threads',
+              icon: '🧵',
+              cardClass: 'threads-card',
+              badgeClass: 'threads',
+              charLimit: 500,
+              copyLabel: 'Copy for Threads',
+              text: result.threads
+            },
+            {
+              key: 'broadcast',
+              label: 'Broadcast Channel',
+              icon: '📡',
+              cardClass: 'broadcast-card',
+              badgeClass: 'broadcast',
+              charLimit: null,
+              copyLabel: 'Copy for Broadcast',
+              text: result.broadcast
+            }
+          ];
+
+          // Header
+          const header = document.createElement('div');
+          header.className = 'flex items-center justify-between mb-2 px-1';
+          header.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-bold text-orange-400">⚡ ${handle}</span>
+              <span class="text-[8px] text-white/15 font-mono">→ 3 PLATFORMS READY</span>
+            </div>
+            <button class="copy-all-platforms text-[9px] font-bold text-white/25 hover:text-white/60 bg-white/3 hover:bg-white/6 px-3 py-1 rounded-lg transition uppercase tracking-wider">Copy All</button>
+          `;
+          tweetBboResult.appendChild(header);
+
+          // Copy All button
+          header.querySelector('.copy-all-platforms').addEventListener('click', () => {
+            const allText = platforms.map(p => `--- ${p.label.toUpperCase()} ---\n${p.text}`).join('\n\n');
+            navigator.clipboard.writeText(allText).then(() => showToast('📋', 'All 3 platforms copied!'));
+          });
+
+          platforms.forEach((platform, i) => {
+            if (!platform.text) return;
+
+            const card = document.createElement('div');
+            card.className = `platform-result-card ${platform.cardClass} rounded-xl p-4 anim-slide mb-2`;
+            card.style.animationDelay = `${i * 0.12}s`;
+
+            const charCount = platform.text.length;
+            let charClass = 'ok';
+            let charDisplay = '';
+            if (platform.charLimit) {
+              if (charCount > platform.charLimit) charClass = 'over';
+              else if (charCount > platform.charLimit * 0.9) charClass = 'tight';
+              charDisplay = `<span class="char-count ${charClass}">${charCount}/${platform.charLimit}</span>`;
+            }
+
+            const safeText = platform.text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+
+            card.innerHTML = `
+              <div class="flex items-center justify-between mb-2.5">
+                <span class="platform-badge ${platform.badgeClass}">${platform.icon} ${platform.label}</span>
+                ${charDisplay}
+              </div>
+              <div class="bg-black/30 rounded-lg p-3 mb-3 border border-white/3">
+                <p class="text-[13px] text-white/85 leading-relaxed font-medium">${safeText}</p>
+              </div>
+              <div class="flex gap-2 items-center">
+                <button class="platform-copy text-[9px] font-bold text-orange-400/60 hover:text-orange-400 bg-orange-400/5 hover:bg-orange-400/10 px-3 py-1.5 rounded-lg transition uppercase tracking-wider">${platform.copyLabel}</button>
+                <button class="platform-heat text-[9px] font-bold text-pink-hot/40 hover:text-pink-hot bg-pink-hot/5 hover:bg-pink-hot/10 px-3 py-1.5 rounded-lg transition uppercase tracking-wider">+ Heat</button>
+                <a href="${sourceUrl}" target="_blank" class="text-[9px] font-bold text-white/10 hover:text-white/30 px-2 py-1.5 transition uppercase tracking-wider ml-auto">↗</a>
+              </div>
+            `;
+
+            // Copy for specific platform
+            card.querySelector('.platform-copy').addEventListener('click', () => {
+              navigator.clipboard.writeText(platform.text).then(() =>
+                showToast('📋', `Copied for ${platform.label}!`)
+              );
+            });
+
+            // Add to Heat
+            card.querySelector('.platform-heat').addEventListener('click', () => {
+              state.manualHeatItems.push({
+                id: `tweet-${platform.key}-` + (++state.heatManualIdCounter),
+                source: handle,
+                bboCaption: platform.text,
+                originalTweet: originalText,
+                platform: platform.key,
+                heat: Math.floor(Math.random() * 15) + 82,
+                addedAt: formatTime()
+              });
+
+              const heatCard = document.createElement('div');
+              heatCard.className = 'heat-card glass-dark rounded-xl p-4 anim-slide';
+              heatCard.innerHTML = `
+                <div class="flex items-center justify-between mb-2.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold text-orange-400/70">${handle}</span>
+                    <span class="platform-badge ${platform.badgeClass}" style="font-size:7px; padding:2px 5px;">${platform.icon} ${platform.label}</span>
+                  </div>
+                </div>
+                <p class="text-[10px] text-white/25 mb-2 leading-relaxed italic">"${originalText.substring(0, 100).replace(/</g, '&lt;')}${originalText.length > 100 ? '...' : ''}"</p>
+                <div class="bg-black/30 rounded-lg p-3 mb-3 border border-white/3">
+                  <p class="text-[13px] text-white/85 leading-relaxed font-medium">${safeText}</p>
+                </div>
+                <div class="flex gap-1.5 justify-end">
+                  <button class="manual-copy-btn text-[9px] font-bold text-orange-400/60 hover:text-orange-400 bg-orange-400/5 hover:bg-orange-400/10 px-3 py-1.5 rounded-lg transition uppercase tracking-wider">Copy</button>
+                </div>
+              `;
+
+              heatCard.querySelector('.manual-copy-btn').addEventListener('click', () => {
+                navigator.clipboard.writeText(platform.text).then(() => showToast('📋', 'Copied!'));
+              });
+
+              heatDrops.appendChild(heatCard);
+              showToast('🔥', `Added ${platform.label} to Heat!`);
+            });
+
+            tweetBboResult.appendChild(card);
+          });
+        }
 
         /* ========== BROADCAST ========== */
         function doBroadcast(item) {
@@ -1486,6 +2624,15 @@ RULES:
         /* ========== INIT ========== */
         updateCount();
         updateAiBadge();
+
+        // Load saved feed URL
+        const savedFeedUrl = localStorage.getItem('bbo_heat_feed_url');
+        if (savedFeedUrl) {
+          feedSourceDisplay.textContent = savedFeedUrl;
+        }
+
+        // Auto-load heat feed on startup
+        loadHeatFeed();
 
       })();
   </script>
