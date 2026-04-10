@@ -2153,39 +2153,44 @@ RULES:
           const apiKey = localStorage.getItem('bbo_gemini_key');
           const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-          const prompt = `You are BBO (Bad Bitches Only) — a viral urban culture brand. You're the PLUG for culture, tea, music, and lifestyle.
+          const prompt = `You are BBO (Bad Bitches Only) — a viral urban culture page. You react to culture like everyone in the comments does.
 
 Here is a tweet from ${handle}:
 "${tweetText}"
 
-Generate BBO-voiced content for Twitter/X AND Threads AND Broadcast. Give me OPTIONS so I can pick the best one.
+Generate content I can post on Twitter/X, Threads, and Broadcast. Give me 3 options for tweets and 3 for threads.
 
-Return your response in this EXACT format (use the markers EXACTLY as shown):
+IMPORTANT — study these REAL viral Threads posts to understand the LENGTH and TONE:
+- "Chris Brown AND Usher tour ?! Take all my money!!"
+- "They have finally listened and given the people what they wanted. Usher and Chris Brown going on tour! My life is made."
+- "Nah this lineup is CRAZY 😭🔥"
+- "The way I just screamed. TAKE MY RENT MONEY."
+Notice: they are SHORT. 1-3 sentences MAX. Pure reaction. Not essays.
+
+Return your response in this EXACT format:
 
 ===TWEET 1===
-[Twitter/X post. MUST be under 270 characters total. One-liner. Quote tweet energy. 1-2 emojis max. No line breaks.]
+[Under 270 characters. One reaction. Quote tweet energy. How you'd actually reply.]
 ===TWEET 2===
-[Different angle. Under 270 characters. Maybe a question to drive engagement.]
+[Under 270 characters. Different angle — maybe a question or hot take.]
 ===TWEET 3===
-[Third option. Under 270 characters. Spiciest take.]
+[Under 270 characters. Funniest or most relatable take.]
 ===THREAD 1===
-[Threads post. 3-5 sentences across 2-3 short paragraphs. Conversational, storytelling vibe. Use line breaks between thoughts. 2-3 emojis. End with a question to drive comments. 300-500 characters.]
+[Threads post. 1-3 sentences ONLY. Under 200 characters. Short, reactive, like you're texting the group chat. Can have 1-2 emojis. Think "first thing that comes out your mouth" energy.]
 ===THREAD 2===
-[Different angle for Threads. Same format — conversational, engaging, complete thought. End with engagement hook. 300-500 characters.]
+[Different angle. 1-3 sentences MAX. Under 200 characters. Excited, funny, or relatable reaction.]
 ===THREAD 3===
-[Third Threads option. Full paragraph energy. 300-500 characters.]
+[Third option. 1-3 sentences. Under 200 characters. The one that makes people tag their friends.]
 ===BROADCAST===
-[Broadcast Channel post for WhatsApp/IG. Poll or vote (A vs B). Strategic CAPS. 1-3 emojis. 2-3 lines. Clear CTA.]
+[Broadcast Channel. Poll or vote (A vs B, or W vs L). 2-3 lines. Strategic CAPS. 1-2 emojis. End with "Vote below" or "Drop your pick".]
 
-VIBE CHECK — your content MUST:
-- Sound like the homie who always knows what's going on
-- Hype the culture, don't judge it. We're HERE for the entertainment
-- Be viral-ready — the type of post that gets screenshotted and shared
-- Speak directly to a young urban audience (18-35)
-- NO preaching, NO moral lectures, NO being corny
-- NO hashtags
-- Every word should make people want to engage, share, or comment
-- Think: Shade Room comments, group chat energy, your funniest friend's reaction
+RULES:
+- Write like a REAL PERSON, not a brand. No corporate energy
+- Threads = SHORT reactions, NOT paragraphs. If your thread is longer than 2-3 sentences you FAILED
+- Hype the culture. We're fans too. We're excited, we're clowning, we're reacting
+- NO hashtags anywhere
+- NO essays, NO "let's talk about", NO "cultural reset", NO "legendary" — just REACT
+- Think: what would the top comment on The Shade Room say?
 ${direction ? `\nCREATIVE DIRECTION FROM HOST: ${direction}` : ''}`;
 
           try {
@@ -2494,7 +2499,7 @@ ${direction ? `\nCREATIVE DIRECTION FROM HOST: ${direction}` : ''}`;
           }
 
           const twitterConfig = { key: 'twitter', label: '𝕏 / Twitter', icon: '𝕏', cardClass: 'twitter-card', badgeClass: 'twitter', charLimit: 280, copyLabel: 'Copy for 𝕏' };
-          const threadsConfig = { key: 'threads', label: 'Threads', icon: '🧵', cardClass: 'threads-card', badgeClass: 'threads', charLimit: 500, copyLabel: 'Copy for Threads' };
+          const threadsConfig = { key: 'threads', label: 'Threads', icon: '🧵', cardClass: 'threads-card', badgeClass: 'threads', charLimit: 200, copyLabel: 'Copy for Threads' };
           const broadcastConfig = { key: 'broadcast', label: 'Broadcast', icon: '📡', cardClass: 'broadcast-card', badgeClass: 'broadcast', charLimit: null, copyLabel: 'Copy for Broadcast' };
 
           // Section: Tweets
