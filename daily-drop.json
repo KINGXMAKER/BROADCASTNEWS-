@@ -1,14 +1,84 @@
 {
-  "generated": "",
+  "meta": {
+    "generated": "2026-04-12T12:00:00-04:00",
+    "engine": "BBO Urban Realness Engine v2",
+    "model": "gemini-2.0-flash"
+  },
   "drops": {
     "noon": {
-      "label": "Noon Drop",
-      "items": []
+      "label": "DAILY HEAT DROP",
+      "timestamp": "2026-04-12T12:00:00-04:00",
+      "accountsScraped": 21,
+      "trending": ["K. Michelle", "Ice Spice", "Detroit rap", "Ye", "Bronny"],
+      "items": [
+        {
+          "id": "drop-001",
+          "source": "@TheShadeRoom",
+          "sourceUrl": "https://x.com/TheShadeRoom/status/1776014300",
+          "tweetUrl": "https://x.com/TheShadeRoom/status/1776014300",
+          "originalTweet": "K. Michelle’s son seen doing Uber in a whole Mercedes-Benz in Memphis 👀 he says he wants to earn his own 💰",
+          "bboCaption": "k. michelle's son out here doing uber in a whole benz in memphis... 💀\n\ni respect the hustle but just say what you mean. is it a humble flex or is memphis too dangerous for this play?\n\nbbo verdict: GUILTY of high-risk hustling ⚖️🔥",
+          "type": "hot-take",
+          "heat": 98,
+          "originalLikes": 125000,
+          "originalRetweets": 12400
+        },
+        {
+          "id": "drop-002",
+          "source": "@SaycheeseDGTL",
+          "sourceUrl": "https://x.com/SaycheeseDGTL/status/1234567891",
+          "tweetUrl": "https://x.com/SaycheeseDGTL/status/1234567891",
+          "originalTweet": "Ice Spice seen at Nobu with a mystery man 👀",
+          "bboCaption": "ice spice at nobu with a mystery man. y'all know bbo got the intel.\n\nrate this on a scale of 'staged for pr' to 'she really out here living' — drop your verdict below ⬇️",
+          "type": "poll",
+          "heat": 87,
+          "originalLikes": 32100,
+          "originalRetweets": 5600
+        },
+        {
+          "id": "drop-003",
+          "source": "@nojumper",
+          "sourceUrl": "https://x.com/nojumper/status/1234567892",
+          "tweetUrl": "https://x.com/nojumper/status/1234567892",
+          "originalTweet": "New underground artist from Detroit just went viral with 10M views in 24 hours 📈",
+          "bboCaption": "detroit stays producing heat 🔥 10m views in 24 hours from an artist nobody knew about yesterday.\n\nfinish this sentence: 'detroit rap is _____ right now' — wrong answers ONLY 🗣️",
+          "type": "finish-sentence",
+          "heat": 97,
+          "originalLikes": 67300,
+          "originalRetweets": 12400
+        },
+        {
+          "id": "drop-004",
+          "source": "@ComplexPop",
+          "sourceUrl": "https://x.com/ComplexPop/status/1234567893",
+          "tweetUrl": "https://x.com/ComplexPop/status/1234567893",
+          "originalTweet": "Kanye's new merch line selling out in under 3 minutes flat",
+          "bboCaption": "3 minutes. that's all it took for ye's merch to evaporate 💨\n\nbbo court is in session — is ye the greatest marketer alive or are y'all just addicted to the chaos?\n\nguilty or not guilty ⚖️",
+          "type": "bbo-court",
+          "heat": 99,
+          "originalLikes": 89400,
+          "originalRetweets": 18200
+        },
+        {
+          "id": "drop-005",
+          "source": "@WorldWideWob",
+          "sourceUrl": "https://x.com/WorldWideWob/status/1234567894",
+          "tweetUrl": "https://x.com/WorldWideWob/status/1234567894",
+          "originalTweet": "Bronny seen working out 3x a day to prep for the draft",
+          "bboCaption": "bronny really out here 3-a-days trying to beat the allegations. 🏀\n\npoll time: A) he's earning his spot B) nepotism still carrying — tap your answer, bbo don't do fence-sitting 🗣️",
+          "type": "poll",
+          "heat": 91,
+          "originalLikes": 54700,
+          "originalRetweets": 9800
+        }
+      ]
     },
-    "6pm": {
-      "label": "6PM Drop",
+    "evening": {
+      "label": "EVENING HEAT DROP",
+      "timestamp": "2026-04-12T18:00:00-04:00",
+      "accountsScraped": 21,
+      "trending": ["Entertainment", "Culture", "Hustle"],
       "items": []
     }
-  },
-  "trending": []
+  }
 }
