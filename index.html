@@ -29,7 +29,12 @@
       background: #080808;
       color: #fff;
       overflow-x: hidden;
-      background-image: radial-gradient(ellipse at 50% -20%, rgba(255, 20, 147, 0.07) 0%, transparent 60%)
+      background-image: radial-gradient(ellipse at 50% -20%, rgba(255, 20, 147, 0.07) 0%, transparent 60%);
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
     }
 
     ::-webkit-scrollbar {
@@ -298,6 +303,33 @@
     .queue-card.live {
       animation: glow-breathe 2s infinite;
       border-color: #FF1493
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 450px) {
+      .logo-text { display: none; }
+      .header-status-text { display: none; }
+      .header-status { gap: 0.25rem; }
+      .header-btn-text { display: none; }
+      .status-badge { padding: 0.5rem; }
+      .settings-btn { width: 44px; height: 44px; padding: 0 !important; display: flex !important; items-center; justify-center; }
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.85rem;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .heat-card {
@@ -646,11 +678,12 @@
       font-weight: 800;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 6px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      margin: 0 auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
     }
 
     .platform-badge.twitter {
@@ -785,35 +818,33 @@
           class="w-9 h-9 rounded-lg bg-gradient-to-br from-pink-hot to-pink-dim flex items-center justify-center font-black text-[11px] tracking-tight shadow-[0_0_15px_rgba(255,20,147,0.4)]">
           BBO</div>
         <div>
-          <h1 class="text-sm font-black tracking-tight leading-none">BROADCAST <span
+          <h1 class="logo-text text-sm font-black tracking-tight leading-none">BROADCAST <span
               class="text-transparent bg-clip-text bg-gradient-to-r from-pink-hot to-pink-glow">DROP</span></h1>
           <p class="text-[9px] text-white/30 font-semibold tracking-[0.2em] uppercase">Content Command Center</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <div id="liveIndicator" class="hidden items-center gap-2 px-3 py-1.5 rounded-full glass-pink">
-          <div class="status-dot status-live"></div>
-          <span class="text-[10px] font-bold text-pink-hot tracking-wider">LIVE</span>
+      <div class="header-status flex items-center gap-2.5">
+          <div id="heatIndicator" class="status-badge bg-orange-500/10 border border-orange-500/20 text-orange-400 hidden">
+            <span>🔥</span> <span class="header-status-text">HEAT READY</span>
+          </div>
+          <div id="aiIndicator" class="status-badge bg-pink-500/10 border border-pink-500/20 text-pink-hot hidden">
+            <span>⚡</span> <span class="header-status-text">AI ON</span>
+          </div>
+          <button id="settingsBtn"
+            class="settings-btn p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all active:scale-90"
+            title="Settings">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
+          <button id="clearAllBtn"
+            class="p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/40 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all hidden sm:block"
+            title="Clear All">
+            <span class="header-btn-text text-[10px] font-bold uppercase tracking-wider">CLEAR</span>
+          </button>
         </div>
-        <div id="heatIndicator" class="hidden items-center gap-2 px-3 py-1.5 rounded-full heat-badge">
-          <span class="text-[10px]">🔥</span>
-          <span class="text-[10px] font-bold text-orange-400 tracking-wider">HEAT READY</span>
-        </div>
-        <div id="aiStatusBadge" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full ai-badge">
-          <span class="text-pink-hot">⚡</span>
-          <span class="font-bold text-pink-glow uppercase">AI ON</span>
-        </div>
-        <button id="settingsBtn"
-          class="btn-ghost w-11 h-11 rounded-xl flex items-center justify-center text-white/50 hover:text-white active:scale-90 transition-all">
-          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </button>
-        <button id="clearAllBtn"
-          class="btn-ghost px-3 py-1.5 rounded-lg text-[10px] font-bold text-white/30 hover:text-white uppercase tracking-wider">Clear</button>
-      </div>
     </div>
   </header>
 
@@ -2204,11 +2235,7 @@ Return your response in this EXACT format:
 ===THREAD 3===
 [The shortest, rawest take.]
 ===BROADCAST===
-[A summary for the Broadcast channel. Longer, with a BBO VERDICT at the bottom.]
-`;
-[Threads post. The one that makes people tag their friends.]
-===BROADCAST===
-[Broadcast Channel. Poll or BBO Verdict. 2-3 lines. Strategic CAPS. End with "Vote below" or "Drop your pick".]
+[A summary for the Broadcast channel. Longer, with a BBO VERDICT at the bottom. Strategic CAPS. End with "Vote below" or "Drop your pick".]
 
 ${direction ? `\nCREATIVE DIRECTION FROM HOST: ${direction}` : ''}`;
 
