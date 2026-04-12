@@ -1298,6 +1298,9 @@ Separation format: ===POST=== on its own line. No extra fluff.`;
         const closeModalBtn = $('#closeModal');
         const modalContent = $('#modalContent');
         const copyBroadcast = $('#copyBroadcast');
+        let modalLastOpened = 0;
+        const MIN_MODAL_TOGGLE_MS = 300;
+
         const downloadBroadcast = $('#downloadBroadcast');
         const settingsBtn = $('#settingsBtn');
         const settingsModal = $('#settingsModal');
@@ -1362,16 +1365,22 @@ Separation format: ===POST=== on its own line. No extra fluff.`;
         }
 
         /* ========== SETTINGS ========== */
-        function openSettingsModal() {
+        function openSettingsModal(e) {
+          if (e) { e.preventDefault(); e.stopPropagation(); }
           const k = localStorage.getItem('bbo_gemini_key');
           if (k) apiKeyInput.value = k;
           const feedUrl = localStorage.getItem('bbo_heat_feed_url');
           if (feedUrl) heatFeedUrlInput.value = feedUrl;
           settingsRemoveKeyBtn.classList.toggle('hidden', !k);
           settingsModal.classList.remove('hidden');
+          modalLastOpened = Date.now();
         }
 
-        function closeSettingsModal() {
+        function closeSettingsModal(e) {
+          if (e && e.target === settingsOverlay) {
+            // Ghost click protection: ignore if modal just opened
+            if (Date.now() - modalLastOpened < MIN_MODAL_TOGGLE_MS) return;
+          }
           settingsModal.classList.add('hidden');
         }
 
@@ -1400,6 +1409,8 @@ Separation format: ===POST=== on its own line. No extra fluff.`;
 
           updateAiBadge();
           showToast('✅', 'Settings saved!');
+          // Force a reload of the feed if the URL changed
+          loadHeatFeed();
           closeSettingsModal();
         });
 
@@ -1869,7 +1880,7 @@ Separation format: ===POST=== on its own line. No extra fluff.`;
             feedSourceDisplay.textContent = 'Not configured';
             // Try loading from same directory (relative path)
             try {
-              const resp = await fetch('./daily-drop.json?t=' + Date.now());
+              const resp = await fetch('./daily-drop.json?t=' + Date.now(), { cache: 'no-store' });
               if (resp.ok) {
                 const data = await resp.json();
                 state.heatData = data;
@@ -1885,8 +1896,8 @@ Separation format: ===POST=== on its own line. No extra fluff.`;
 
           feedSourceDisplay.textContent = feedUrl;
           try {
-            const resp = await fetch(feedUrl + '?t=' + Date.now());
-            if (!resp.ok) throw new Error('Failed to fetch');
+            const resp = await fetch(feedUrl + (feedUrl.includes('?') ? '&' : '?') + 't=' + Date.now(), { cache: 'no-store' });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
             const data = await resp.json();
             state.heatData = data;
             renderHeatDrops();
@@ -2158,36 +2169,43 @@ Separation format: ===POST=== on its own line. No extra fluff.`;
           const apiKey = localStorage.getItem('bbo_gemini_key');
           const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-          const prompt = `You are BBO (Big Boss Operator) — a viral urban culture page. You react to culture like everyone in the comments does. Your voice is "Urban Realness": blunt, raw, and street-smart.
+          const prompt = `You are BBO (Big Boss Operator) — the definitive voice of urban culture, moving with the speed and attitude of The Shade Room but with more street-intel. You don't "analyze" culture; you react to it like a cousin in the group chat who keeps it too real.
+
+Your voice is "Urban Realness": blunt, raw, street-smart, and unapologetically opinionated. We don't talk ABOVE people; we talk WITH them.
 
 Here is a tweet from ${handle}:
 "${tweetText}"
 
-Generate content I can post on Twitter/X, Threads, and Broadcast. Give me 3 options for tweets and 3 for threads.
+Generate content for Twitter/X, Threads, and Broadcast.
 
-RULES:
-- lowercase by default. short, punchy lines.
-- No corporate speak, no professional filters. "just say what you mean."
-- Tone: blunt, relatable, authentic. we keep it 100.
-- THREADS = SHORT reactions (1-3 lines). What would people actually text the group chat?
-- TWEETS = Quote tweet energy. polarizing, funny, high-heat.
-- VOCABULARY: use words like hustle, intel, realness, Legion, operator, blueprint, verdict, drip, move.
-- FORBIDDEN WORDS: synergy, leverage, holistic, moreover, furthermore, utilize, perspective, expert, authoritative, delve, in today's world.
-- NO hashtags. Numbers are always digits (10, not ten).
+RULES FOR THE BBO VOICE:
+- lowercase everything. period. no capitalized "I" or proper nouns unless it's a specific brand like BBO.
+- no corporate speak. if it sounds like a social media manager wrote it, DELETE IT.
+- be blunt. give a verdict. use "GUILTY" or "NOT GUILTY" or "BBO VERDICT: [blunt truth]".
+- engage the community. ask "who else saw this?", "rate this 1-10", "guilty or not guilty?".
+- VOCAB: hustle, intel, realness, Legion, operator, blueprint, verdict, drip, move, humble flex, reach, allegations.
+- FORBIDDEN: synergy, leverage, holistic, moreover, furthermore, utilize, perspective, in today's world, dive deep, unleash.
+- NO hashtags. NO emojis at the start of lines. Use emojis ONLY for emphasis at the end.
+- THREADS: 1-line reactions. "moving like this in 2024 is wild."
+- TWEETS: quote-tweet energy. polarizing vs funny.
 
 Return your response in this EXACT format:
 
 ===TWEET 1===
-[Under 270 characters. Blunt reaction.]
+[Blunt, lowercase reaction. "moving like this in memphis is a high risk play."]
 ===TWEET 2===
-[Under 270 characters. Different angle — maybe a question or hot take.]
+[A question for the streets. "who else thinks this is just a humble flex?"]
 ===TWEET 3===
-[Under 270 characters. Funniest or most relatable take.]
+[The BBO Verdict. "bbo verdict: guilty of doing too much for the cameras."]
 ===THREAD 1===
-[Threads post. 1-2 sentences. Pure reaction energy.]
+[Text-style reaction. short.]
 ===THREAD 2===
-[Threads post. Short, reactive, like you're texting the crib.]
+[Another short reaction.]
 ===THREAD 3===
+[The shortest, rawest take.]
+===BROADCAST===
+[A summary for the Broadcast channel. Longer, with a BBO VERDICT at the bottom.]
+`;
 [Threads post. The one that makes people tag their friends.]
 ===BROADCAST===
 [Broadcast Channel. Poll or BBO Verdict. 2-3 lines. Strategic CAPS. End with "Vote below" or "Drop your pick".]
