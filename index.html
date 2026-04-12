@@ -804,8 +804,8 @@
           <span class="font-bold text-pink-glow uppercase">AI ON</span>
         </div>
         <button id="settingsBtn"
-          class="btn-ghost w-9 h-9 rounded-lg flex items-center justify-center text-white/40 hover:text-white">
-          <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          class="btn-ghost w-11 h-11 rounded-xl flex items-center justify-center text-white/50 hover:text-white active:scale-90 transition-all">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -1119,7 +1119,7 @@
             <span class="text-xs font-black text-pink-hot tracking-wider">BROADCASTING</span>
           </div>
           <button id="closeModal" class="text-white/30 hover:text-white transition-colors">
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -1165,13 +1165,15 @@
 
           <!-- Heat Feed URL -->
           <div>
-            <label class="text-[10px] font-bold text-orange-400/60 uppercase tracking-[0.15em] mb-2 block">🔥 Heat Feed URL
-              <span class="text-white/20">(daily-drop.json)</span></label>
+            <label class="text-[10px] font-bold text-orange-400/60 uppercase tracking-[0.15em] mb-2 block flex justify-between">
+              <span>🔥 Heat Feed URL</span>
+              <button onclick="navigator.clipboard.writeText('https://raw.githubusercontent.com/KINGXMAKER/BROADCASTNEWS-/main/daily-drop.json'); showToast('📋', 'URL Copied')" class="text-pink-hot hover:underline">Copy Default</button>
+            </label>
             <input type="url" id="heatFeedUrlInput"
               class="w-full bg-black border border-white/8 rounded-xl p-4 text-sm text-white focus:outline-none focus:border-orange-400/40 transition font-mono placeholder-white/15"
               placeholder="https://raw.githubusercontent.com/YOUR-REPO/main/daily-drop.json">
             <p class="text-[10px] text-white/25 mt-2 font-medium">URL to your <code class="text-orange-400/50">daily-drop.json</code> file.
-              Can be a GitHub raw URL, Google Apps Script endpoint, or any JSON API.</p>
+              Click "Copy Default" to use your standard GitHub repo feed.</p>
           </div>
 
           <div class="flex gap-3 pt-1">
@@ -1236,29 +1238,27 @@
           '@DailyLoud', '@nojumper', '@ComplexPop', '@HTERK', '@WorldWideWob'
         ];
 
-        const AI_SYSTEM_PROMPT = `You are the content engine for BBO (Big Boss Operator), an urban lifestyle brand. Your voice is "Urban Realness"—blunt, street-smart, and community-focused. 
-        
-        We talk WITH the community, not at them. No corporate speak, no "expert" filters. Just realness.
+        const AI_SYSTEM_PROMPT = `You are the content engine for BBO (Big Boss Operator) — a viral urban lifestyle brand. Your voice is "Urban Realness": blunt, raw, and community-relatable. We don't talk above the community; we talk WITH them.
 
-        ### CORE GUIDELINES:
-        - TONE: Blunt, raw, relatable, unapologetic. Treat every news item as a culture debate.
-        - FORMAT: lowercase by default. short, punchy lines. line breaks between every thought.
-        - VOCABULARY: use words like hustle, intel, realness, Legion, operator, blueprint, verdict, drip, move.
-        - FORBIDDEN WORDS: synergy, leverage, holistic, moreover, furthermore, utilize, perspective, expert, authoritative, delve, in today's world.
-        - PHRASES TO USE: "just say what you mean", "i respect the hustle but...", "stay producing heat", "BBO verdict: [X]".
-        - NEVER use hashtags or dense paragraphs.
-        - Numbers are always digits (10, not ten).
+Think "Shade Room" energy — but with an operator's edge.
 
-        ### TASK:
-        Analyze the provided media/text. Identify the "Street-Smart" angle or the debate. 
-        Generate 4 different broadcast posts:
+### CORE GUIDELINES:
+- TONE: Blunt, raw, witty, and street-smart. Treat news as a culture debate.
+- FORMAT: lowercase by default. extremely punchy. use line breaks for every thought.
+- VOCABULARY: hustle, intel, realness, Legion, operator, blueprint, verdict, drip, play, movement.
+- FORBIDDEN WORDS: synergy, leverage, holistic, moreover, furthermore, utilize, perspective, expert, authoritative, delve, in today's world.
+- PHRASES: "just say what you mean", "i respect the hustle but...", "heat mode only", "BBO verdict: [X]".
+- NO hashtags. Numbers are always digits (10, not ten).
 
-        1. A spicy 2-option poll (A vs B) — give them clear opposites to choose from.
-        2. A "BBO Court" verdict scenario (Guilty / Not Guilty) — call out the logic or lack thereof.
-        3. A "Finish the sentence" prompt — keep it punchy and viral.
-        4. A polarizing hot take + "Agree or Disagree" — stay producing heat.
+### GENERATION TASKS:
+Analyze the media/text and produce exactly 4 posts separated by ===POST===:
 
-        Each post must be separated by ===POST=== on its own line. No extra fluff.`;
+1. SPICY POLL: A vs B with clear, polarizing opposites.
+2. BBO COURT VERDICT: Use "BBO Verdict: [Guilty/Not Guilty]" followed by 1-2 blunt lines explaining why. Call out any "lack of logic".
+3. FINISH THE SENTENCE: A viral-style prompt that forces people to comment.
+4. HOT TAKE: A polarizing opinion + "Agree or Disagree".
+
+Separation format: ===POST=== on its own line. No extra fluff.`;
 
         /* ========== DOM REFS ========== */
         const $ = s => document.querySelector(s);
@@ -2160,8 +2160,8 @@
 
           const prompt = `You are BBO (Big Boss Operator) — a viral urban culture page. You react to culture like everyone in the comments does. Your voice is "Urban Realness": blunt, raw, and street-smart.
 
-Here is a tweet from \${handle}:
-"\${tweetText}"
+Here is a tweet from ${handle}:
+"${tweetText}"
 
 Generate content I can post on Twitter/X, Threads, and Broadcast. Give me 3 options for tweets and 3 for threads.
 
@@ -2192,7 +2192,7 @@ Return your response in this EXACT format:
 ===BROADCAST===
 [Broadcast Channel. Poll or BBO Verdict. 2-3 lines. Strategic CAPS. End with "Vote below" or "Drop your pick".]
 
-\${direction ? \`\\nCREATIVE DIRECTION FROM HOST: \${direction}\` : ''}\`;
+${direction ? `\nCREATIVE DIRECTION FROM HOST: ${direction}` : ''}`;
 
           try {
             const resp = await fetch(url, {
